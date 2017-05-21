@@ -31,12 +31,17 @@ declare -r metagoofil_folder='metagoofil'
 declare -r wig_git='https://github.com/jekyc/wig.git'
 declare -r wig_folder='wig'
 
+declare -r arachni_git='https://github.com/Arachni/arachni/releases/download/v1.5.1/arachni-1.5.1-0.5.12-linux-x86_64.tar.gz'
+
+
+
 declare -a required_apps=("nmap" 
 						"nikto" 
 						"sniper" 
 						"fatrat" 
 						"./$application_path$metagoofil_folder/metagoofil.py" 
 						"./$application_path$wig_folder/wig.py"
+						"./Application/arachni/bin/arachni_web"
 						"openvas-start"
 						)
 
@@ -74,8 +79,7 @@ function install_git {
 
 function install_message {
 	#Download and install nmap
-	echo -e "$OKGREEN	[-]::[Installing]: $1 Internet Required! Please Wait.... $RESET"
-	echo -e "$OKGREEN	[✔-OK!]::[Apps]: $i $RESET"
+	echo -e "$OKGREEN	[-]::[Installing]: Downloading $1..Please Wait.... $RESET"
 	}
 
 function install_apps {
@@ -83,11 +87,13 @@ function install_apps {
 	"nmap")
 		install_message $1
 		install_git $nmap_git $nmap_folder
+		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"
 		;;
 	"nikto")
 		#Download and install nikto	
 		install_message $1
 		install_git $nikto_git $nikto_folder
+		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"
 		;;
 	"sniper")
 		#Download and install sn1per
@@ -95,17 +101,21 @@ function install_apps {
 		install_git $sniper_git $sniper_folder
 		chmod 777 $application_path$sniper_folder/install.sh &> /dev/null
 		chmod 777 $application_path$sniper_folder/sniper.sh &> /dev/null
-		./$application_path$sniper_folder/install.sh &> /dev/null		
+		./$application_path$sniper_folder/install.sh &> /dev/null
+		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"		
 		;;
 	"fatrat")
 		#Download and install fatrat
 		install_message $1
 		install_git $fatrat_git $fatrat_folder
+		chmod +x $application_path$fatrat_folder/setup.sh
+		./$application_path/$fatrat_folder/setup.sh
 		;;
 	"./$application_path$metagoofil_folder/metagoofil.py")
 		install_message metagoofil
 		install_git $metagoofil_git $metagoofil_folder
 		chmod +x $application_path$metagoofil_folder/metagoofil.py &> /dev/null
+		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"
 		#Install apps
 		;;
 	"./$application_path$wig_folder/wig.py")
@@ -115,12 +125,23 @@ function install_apps {
 		cd $application_path$wig_folder
 		chmod 777 setup.py wig.py &> /dev/null
 		python setup.py install &> /dev/null
+		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"
+		;;
+	"./Application/arachni/bin/arachni_web")
+		install_message arachni
+		echo & echo
+		wget $arachni_git -P $application_path 
+		tar -xvzf $application_path/arachni-1.5.1-0.5.12-linux-x86_64.tar.gz -C $application_path 
+		mv $application_path/arachni-1.5.1-0.5.12 $application_path/arachni &> /dev/null
+		rm $application_path/arachni-1.5.1-0.5.12-linux-x86_64.tar.gz &> /dev/null
+		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"
 		;;
 	"openvas-start")
 		install_message openvas &> /dev/null
 		apt-get install openvas &> /dev/null
 		y  &> /dev/null
 		openvas-setup &> /dev/null
+		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"
 		;;
 	*)
 		echo ""
@@ -268,8 +289,8 @@ function brute_dir_module {
 	output="Web_Directory_Bruteforce_Report"
 	mkdir -p $report_path$hosts 2> /dev/null
 	#wfuzz -c -z file,/usr/share/wordlists/fasttrack.txt --hc 404,301 -o html http://example.com/FUZZ > output.html
-	echo
-	echo -e "$OKRED Bruteforcing....Please wait...... $RESET"
+	echo -e $OKRED
+	echo -e "Bruteforcing....Please wait...... "$RESET
 	wfuzz -c -z file,$use_word_list --hc 404,301,302 -o html $protocols://$hosts/FUZZ &>> $report_path$hosts/$output.html
 	x-www-browser $report_path$hosts/$output.html 2> /dev/null &
 	recon
@@ -287,7 +308,6 @@ function nikto_module {
 	x-www-browser $report_path$hosts/$output.html 2> /dev/null &
 	recon
 	}
-
 	
 function wig_module {
 	echo -e "Http or Https? \c"
@@ -297,7 +317,7 @@ function wig_module {
 	output="CMS_Identifier_Report"
 	mkdir -p $report_path$hosts 2> /dev/null
 	#./Application/wig/wig.py http://localhost:9292  &>> Report/localhost/CMS_Identifier_Report.txt
-	echo & echo -e "$OKRED Scanning...This process might take same time, please wait.." & echo
+	echo  -e $OKRED & echo -e "Scanning...This process might take same time, please wait..$RESET" & echo
 	./Application/wig/wig.py $protocols://$hosts  &>> $report_path$hosts/$output.txt
 	xdg-open $report_path$hosts/$output.txt 2> /dev/null &
 	recon
@@ -342,6 +362,8 @@ function http_method_module {
 			curl -i -X OPTIONS $line >>$report_path$hosts/$output.txt
 			echo >> $report_path$hosts/$output.txt
 			echo
+			echo "#####################################################################################################"
+			echo
 		done <"$links"
 		
 		read -p "Test again? Y/n " response 		
@@ -357,9 +379,10 @@ function cewl_module {
 	read hosts
 	output="Possible_Password"
 	mkdir -p $report_path$hosts 2> /dev/null
+	echo "" > $report_path$hosts/$output.txt
+	cewl -w $report_path$hosts/$output.txt -d 5 -m 7 $hosts
 	echo
-	xterm -hold -e "cewl -w $report_path$hosts/$output.txt -d 5 -m 7 $hosts" &
-	echo
+	xdg-open $report_path$hosts/$output.txt 2> /dev/null &
 	recon
 	}
 
@@ -374,20 +397,20 @@ function cewl_module {
 #                                         |___/                                   
 
 function arachni_module {
-	xterm -hold -e './Application/arachni/bin/arachni_web' &
-	echo -e "$OKORANGE Admin Account	:- $RESET user: admin@admin.admin	pass: administrator"
-	echo -e "$OKORANGE User Account	:- $RESET user: user@user.user	pass: regular_user"
+	xterm -hold -e 'echo -e "Admin Account	:--- user: admin@admin.admin	pass: administrator" & 
+	echo -e "User Account	:--- user: user@user.user	pass: regular_user" & 
+	./Application/arachni/bin/arachni_web' &
 	sleep 10
-	x-www-browser http://localhost:4000 &
+	x-www-browser http://localhost:9292 &
 	va_scanning
 	}
 
 	
 function open_vas_module {
-	xterm -hold -e 'openvas-start' &
-	echo -e $OKRED"A moment..Loading module............... "$RESET & echo
-	echo -e "$OKORANGE User Account	:- $RESET user: admin	pass: admin"
-	sleep 30
+	xterm -hold -e 'echo -e "User Account	:--- user: admin	pass: admin" & 
+	openvas-start &
+	openvasmd --user=admin --new-password=admin'&
+	sleep 20
 	x-www-browser https://127.0.0.1:9392 &
 	va_scanning
 	}
