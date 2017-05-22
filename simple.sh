@@ -87,7 +87,7 @@ function install_apps {
 	"nmap")
 		install_message $1
 		apt-get install nmap
-		y
+		yes
 		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"
 		;;
 	"nikto")
@@ -103,15 +103,15 @@ function install_apps {
 		chmod 777 $application_path$sniper_folder/install.sh &> /dev/null
 		chmod 777 $application_path$sniper_folder/sniper.sh &> /dev/null
 		./$application_path$sniper_folder/install.sh 
-		y
+		yes
 		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"		
 		;;
 	"fatrat")
 		#Download and install fatrat
 		install_message $1
 		install_git $fatrat_git $fatrat_folder
-		chmod +x $application_path$fatrat_folder/setup.sh
-		./$application_path/$fatrat_folder/setup.sh
+		chmod 777 $application_path$fatrat_folder/setup.sh
+		gnome-terminal -x ./$application_path/$fatrat_folder/setup.sh &
 		;;
 	"./$application_path$metagoofil_folder/metagoofil.py")
 		install_message metagoofil
@@ -140,9 +140,7 @@ function install_apps {
 		;;
 	"openvas-start")
 		install_message openvas &> /dev/null
-		apt-get install openvas &> /dev/null
-		y  &> /dev/null
-		openvas-setup &> /dev/null
+		gnome-terminal -x apt-get install openvas & openvas-setup &
 		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"
 		;;
 	*)
@@ -200,6 +198,7 @@ function nmap_module {
 	xml2html $hosts $output
 	nmap_interface
 	}
+	
 
 function nmap_udp_module {
 	echo -e "What is your host? \c"
@@ -210,6 +209,7 @@ function nmap_udp_module {
 	xml2html $hosts $output
 	nmap_interface
 	}
+	
 
 function nmap_aio_enum_module {
 	echo -e "What is your host? \c"
@@ -311,6 +311,7 @@ function nikto_module {
 	recon
 	}
 	
+	
 function wig_module {
 	echo -e "Http or Https? \c"
 	read protocols
@@ -325,11 +326,13 @@ function wig_module {
 	recon
 	}	
 	
+	
 function maltego_module {
 	xterm -hold -e 'maltegoce' &
 	recon
 	}
 
+	
 function reconng_module {
 	echo -e '#!/bin/sh\n recon-ng' > $application_path/reconng.sh
 	chmod +x $application_path/reconng.sh
@@ -337,10 +340,12 @@ function reconng_module {
 	recon
 	}
 	
+	
 function maltego_module {
 	xterm -hold -e 'maltegoce' &
 	recon
 	}
+	
 	
 function http_method_module {
 	response='y'  
