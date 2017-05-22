@@ -86,7 +86,8 @@ function install_apps {
 	case "$1" in
 	"nmap")
 		install_message $1
-		install_git $nmap_git $nmap_folder
+		apt-get install nmap
+		y
 		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"
 		;;
 	"nikto")
@@ -101,7 +102,8 @@ function install_apps {
 		install_git $sniper_git $sniper_folder
 		chmod 777 $application_path$sniper_folder/install.sh &> /dev/null
 		chmod 777 $application_path$sniper_folder/sniper.sh &> /dev/null
-		./$application_path$sniper_folder/install.sh &> /dev/null
+		./$application_path$sniper_folder/install.sh 
+		y
 		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"		
 		;;
 	"fatrat")
@@ -400,7 +402,7 @@ function arachni_module {
 	xterm -hold -e 'echo -e "Admin Account	:--- user: admin@admin.admin	pass: administrator" & 
 	echo -e "User Account	:--- user: user@user.user	pass: regular_user" & 
 	./Application/arachni/bin/arachni_web' &
-	sleep 10
+	sleep 25
 	x-www-browser http://localhost:9292 &
 	va_scanning
 	}
@@ -410,7 +412,7 @@ function open_vas_module {
 	xterm -hold -e 'echo -e "User Account	:--- user: admin	pass: admin" & 
 	openvas-start &
 	openvasmd --user=admin --new-password=admin'&
-	sleep 20
+	sleep 25
 	x-www-browser https://127.0.0.1:9392 &
 	va_scanning
 	}
