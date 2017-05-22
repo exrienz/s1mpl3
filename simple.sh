@@ -364,7 +364,7 @@ function http_method_module {
 			curl -i -X OPTIONS $line >>$report_path$hosts/$output.txt
 			echo >> $report_path$hosts/$output.txt
 			echo
-			echo "#####################################################################################################"
+			echo 
 			echo
 		done <"$links"
 		
