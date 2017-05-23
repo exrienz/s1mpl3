@@ -9,6 +9,8 @@
 #                                          
 #     
 
+declare -r ip_local=$(ip -4 route get 8.8.8.8 | awk {'print $7'} | tr -d '\n')
+
 declare -r application_path='Application/'
 declare -r report_path='Report/'
 declare -r bin_path='/usr/local/bin'
@@ -32,7 +34,7 @@ declare -r wig_git='https://github.com/jekyc/wig.git'
 declare -r wig_folder='wig'
 
 declare -r arachni_git='https://github.com/Arachni/arachni/releases/download/v1.5.1/arachni-1.5.1-0.5.12-linux-x86_64.tar.gz'
-
+declare -r nessus_git='http://www.coco.oligococo.tk/file/Nessus-6.10.5-debian6_amd64.deb'
 
 
 declare -a required_apps=("nmap" 
@@ -43,6 +45,7 @@ declare -a required_apps=("nmap"
 						"./$application_path$wig_folder/wig.py"
 						"./Application/arachni/bin/arachni_web"
 						"openvas-start"
+						"/etc/init.d/nessusd start"
 						)
 
 declare -a wordlist_path=("/usr/share/wordlists/wfuzz/general/common.txt"
@@ -74,7 +77,8 @@ function apps_exist {
 
 
 function install_git {
-	git clone $1 $application_path$2  &> /dev/null
+	xterm -e "git clone $1 $application_path$2" &
+	wait
 	}
 
 function install_message {
@@ -86,14 +90,15 @@ function install_apps {
 	case "$1" in
 	"nmap")
 		install_message $1
-		apt-get install nmap
-		yes
+		xterm -e "apt-get install nmap & yes" &
+		wait
 		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"
 		;;
 	"nikto")
 		#Download and install nikto	
 		install_message $1
-		install_git $nikto_git $nikto_folder
+		xterm -e "apt-get install nikto & yes" &
+		wait
 		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"
 		;;
 	"sniper")
@@ -102,18 +107,24 @@ function install_apps {
 		install_git $sniper_git $sniper_folder
 		chmod 777 $application_path$sniper_folder/install.sh &> /dev/null
 		chmod 777 $application_path$sniper_folder/sniper.sh &> /dev/null
-		./$application_path$sniper_folder/install.sh 
-		yes
+		xterm -e "./$application_path$sniper_folder/install.sh & yes" &
+		wait
+		rm -r $application_path$sniper_folder
 		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"		
 		;;
 	"fatrat")
 		#Download and install fatrat
 		install_message $1
 		install_git $fatrat_git $fatrat_folder
-		chmod 777 $application_path$fatrat_folder/setup.sh
-		gnome-terminal -x ./$application_path/$fatrat_folder/setup.sh &
+		chmod +x $application_path$fatrat_folder/powerfull.sh
+		chmod +x $application_path$fatrat_folder/setup.sh
+		xterm -e "./$application_path$fatrat_folder/setup.sh" &
+		wait
+		rm -r $application_path$fatrat_folder
+		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"		
 		;;
 	"./$application_path$metagoofil_folder/metagoofil.py")
+		#Download and install Metagoofil
 		install_message metagoofil
 		install_git $metagoofil_git $metagoofil_folder
 		chmod +x $application_path$metagoofil_folder/metagoofil.py &> /dev/null
@@ -121,26 +132,41 @@ function install_apps {
 		#Install apps
 		;;
 	"./$application_path$wig_folder/wig.py")
+		#Download and install Wig
 		install_message wig
 		install_git $wig_git $wig_folder
 		#Install apps
 		cd $application_path$wig_folder
-		chmod 777 setup.py wig.py &> /dev/null
-		python setup.py install &> /dev/null
+		chmod +x setup.py wig.py &> /dev/null
+		xterm -e "python $application_path$wig_folder/setup.py install"  &
+		wait
 		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"
 		;;
 	"./Application/arachni/bin/arachni_web")
+		#Download and install arachni
 		install_message arachni
 		echo & echo
-		wget $arachni_git -P $application_path 
-		tar -xvzf $application_path/arachni-1.5.1-0.5.12-linux-x86_64.tar.gz -C $application_path 
-		mv $application_path/arachni-1.5.1-0.5.12 $application_path/arachni &> /dev/null
-		rm $application_path/arachni-1.5.1-0.5.12-linux-x86_64.tar.gz &> /dev/null
+		xterm -e "wget $arachni_git -P $application_path" &
+		wait
+		xterm -e "tar -xvzf $application_path/arachni-1.5.1-0.5.12-linux-x86_64.tar.gz -C $application_path &&	
+		mv $application_path/arachni-1.5.1-0.5.12 $application_path/arachni && 
+		rm $application_path/arachni-1.5.1-0.5.12-linux-x86_64.tar.gz" &
+		wait
 		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"
 		;;
 	"openvas-start")
+		#Download and install OpenVas
 		install_message openvas &> /dev/null
-		gnome-terminal -x apt-get install openvas & openvas-setup &
+		xterm -e "apt-get install openvas && openvas-setup" &
+		wait
+		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"
+		;;
+	"/etc/init.d/nessusd start")
+		#Download and install Nessus
+		install_message Nessus &> /dev/null
+		xterm -e "wget $nessus_git -P $application_path && dpkg -i $application_path/Nessus-6.10.5-debian6_amd64.deb" &
+		wait
+		rm $application_path/Nessus-6.10.5-debian6_amd64.deb
 		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"
 		;;
 	*)
@@ -151,11 +177,9 @@ function install_apps {
 	esac	
 }
 
-
 function create_dir (){
 	mkdir -p $report_path$1
 }
-
 
 function wordlist (){
 	echo
@@ -187,7 +211,6 @@ function xml2html () {
 #                                                                 
 #                                                                 
 
-                              
 
 function nmap_module {
 	echo -e "What is your host? \c"
@@ -198,8 +221,8 @@ function nmap_module {
 	xml2html $hosts $output
 	nmap_interface
 	}
-	
 
+	
 function nmap_udp_module {
 	echo -e "What is your host? \c"
 	read hosts
@@ -209,8 +232,8 @@ function nmap_udp_module {
 	xml2html $hosts $output
 	nmap_interface
 	}
-	
 
+	
 function nmap_aio_enum_module {
 	echo -e "What is your host? \c"
 	read hosts
@@ -414,14 +437,38 @@ function arachni_module {
 
 	
 function open_vas_module {
-	xterm -hold -e 'echo -e "User Account	:--- user: admin	pass: admin" & 
-	openvas-start &
-	openvasmd --user=admin --new-password=admin'&
+	xterm -hold -e 'echo -e "User Account	user: admin	pass: admin" & 
+	openvasmd --user=admin --new-password=admin &
+	openvas-start' &
+	#openvas-start
+	#openvas-stop
 	sleep 25
 	x-www-browser https://127.0.0.1:9392 &
 	va_scanning
 	}
+
 	
+function burpsuite_module {
+	xterm -hold -e 'echo "
+	DONT CLOSE THIS WINDOW!
+	Please set proxy to 127.0.0.1:8080 and enable intercept mode" & 
+	echo &
+	burpsuite'&
+	sleep 25
+	x-www-browser &
+	va_scanning
+	}
+
+	
+function nessus_module {
+	xterm -hold -e 'echo "For 1st time login:
+    1. Register account
+    2. Enter licence, register from here : https://www.tenable.com/register
+	" & /etc/init.d/nessusd start' &
+	sleep 25
+	x-www-browser https://kali:8834/ &
+	va_scanning
+	}
 
 
 #    ______            _       _ _     __  __           _       _      
@@ -434,7 +481,12 @@ function open_vas_module {
 #               |_|                                                    
 
 
-		
+function fatrat_module {
+	gnome-terminal -e "fatrat" &
+	exploit_interface
+	}
+
+	
 #    _____       _             __               
 #   |_   _|     | |           / _|              
 #     | |  _ __ | |_ ___ _ __| |_ __ _  ___ ___ 
@@ -452,8 +504,7 @@ echo -e "$OKRED██╔════╝███║████╗ ████�
 echo -e "$OKRED███████╗╚██║██╔████╔██║██████╔╝██║      █████╔╝  $RESET"
 echo -e "$OKRED╚════██║ ██║██║╚██╔╝██║██╔═══╝ ██║      ╚═══██╗  $RESET"
 echo -e "$OKRED███████║ ██║██║ ╚═╝ ██║██║     ███████╗██████╔╝  $RESET"
-echo -e "$OKRED╚══════╝ ╚═╝╚═╝     ╚═╝╚═╝     ╚══════╝╚═════╝	$RESET"
-
+echo -e "$OKRED╚══════╝ ╚═╝╚═╝     ╚═╝╚═╝     ╚══════╝╚═════╝x64B1T	$RESET"
 }
 
 
@@ -461,15 +512,17 @@ function init {
 	main_logo
 	echo -e "$OKGREEN
 [+]       Coded BY Muzaffar Mohamed       [+] 
-[-]           coco.oligococo.tk           [-] 
+[-]           coco.oligococo.tk           [-]
+[-]       	    Local IP:         	  [-]$RESET $OKORANGE
+[-]             $ip_local      	  [-]$RESET $OKGREEN  
 
 Select from the menu:
 	
 	1 : Reconnaisance
 	2 : Vulnerability Scanning
 	3 : Exploit
-	4 : Post Exploit
-	9 : Update Module
+	4 : Post Exploit # TODO
+	9 : Update Module # TODO
 	
 	99: Exit
 	$RESET"
@@ -485,13 +538,7 @@ Select from the menu:
 		va_scanning
 		;;
 	"3")
-		echo "Lets Exploit!"
-		;;
-	"4")
-		echo "Post Exploit!"
-		;;
-	"9")
-		echo "Lets Update!"
+		exploit_interface
 		;;
 	*)
 		echo "Arigatou! Sayonara~"
@@ -504,7 +551,9 @@ function recon {
 	main_logo
 	echo -e "$OKGREEN
 [+]       Coded BY Muzaffar Mohamed       [+] 
-[-]           coco.oligococo.tk           [-] 
+[-]           coco.oligococo.tk           [-]
+[-]       	    Local IP:         	  [-]$RESET $OKORANGE
+[-]             $ip_local      	  [-]$RESET $OKGREEN  
 
 Select from the 'Reconnaisance' menu:
 	
@@ -512,7 +561,7 @@ Select from the 'Reconnaisance' menu:
 	2  : Sn1per - $OKORANGE All-in-one Enumerator $RESET $OKGREEN
 	3  : Nikto - $OKORANGE Server Configuration Scanner $RESET $OKGREEN
 	4  : Wig - $OKORANGE CMS Identifier $RESET $OKGREEN
-	5  : Web Crawler - $OKORANGE Website Crawler $RESET $OKGREEN
+	5  : Burpsuite_module - $OKORANGE Active/Passive Website Crawler $RESET $OKGREEN
 	6  : WFuzz - $OKORANGE Hidden Web Directory Bruteforcer $RESET $OKGREEN
 	7  : Metagoofil - $OKORANGE Information gathering tool $RESET $OKGREEN
 	8  : HTTP Method Analyzer - $OKORANGE Http Method Analyzer $RESET $OKGREEN
@@ -540,7 +589,7 @@ Select from the 'Reconnaisance' menu:
 		wig_module
 		;;
 	"5")
-		echo "Crawler"
+		burpsuite_module
 		;;
 	"6")
 		brute_dir_module
@@ -571,7 +620,9 @@ function nmap_interface {
 	main_logo
 	echo -e "$OKGREEN
 [+]       Coded BY Muzaffar Mohamed       [+] 
-[-]           coco.oligococo.tk           [-] 
+[-]           coco.oligococo.tk           [-]
+[-]       	    Local IP:         	  [-]$RESET $OKORANGE
+[-]             $ip_local      	  [-]$RESET $OKGREEN  
 
 Select from the 'Nmap command' menu:
 	
@@ -624,17 +675,17 @@ function va_scanning {
 	main_logo
 	echo -e "$OKGREEN
 [+]       Coded BY Muzaffar Mohamed       [+] 
-[-]           coco.oligococo.tk           [-] 
+[-]           coco.oligococo.tk           [-]
+[-]       	    Local IP:         	  [-]$RESET $OKORANGE
+[-]             $ip_local      	  [-]$RESET $OKGREEN  
 
 Select from the 'Vulnerability Scanning' menu:
 	
-	1 : Arachni
-	2 : Openvas
-	3 : 
-	4 : 
-	5 : 
-	6 : 
-	7 : 
+	1 : Arachni - $OKORANGE  Web Application Security Scanner $RESET $OKGREEN
+	2 : Openvas - $OKORANGE Vulnerability Scanning and Management Solution $RESET $OKGREEN
+	3 : Nessus - $OKORANGE Vulnerability Scanning Tool $RESET $OKGREEN
+	4 : Burpsuit - $OKORANGE  Toolkit for Web Application Security Testing $RESET $OKGREEN
+	5 : CMS VulnerabilityScanner - $OKORANGE  TODO $RESET $OKGREEN
 	
 	99 : Return		
 	$RESET"
@@ -649,6 +700,12 @@ Select from the 'Vulnerability Scanning' menu:
 	"2")
 		open_vas_module
 		;;
+	"3")
+		nessus_module
+		;;
+	"4")
+		burpsuite_module
+		;;
 	*)
 		#echo "Huhhh! Wrong input!"
 		init
@@ -656,6 +713,35 @@ Select from the 'Vulnerability Scanning' menu:
 	esac
 }
 
+
+function exploit_interface {
+	main_logo
+	echo -e "$OKGREEN
+[+]       Coded BY Muzaffar Mohamed       [+] 
+[-]           coco.oligococo.tk           [-]
+[-]       	    Local IP:         	  [-]$RESET $OKORANGE
+[-]             $ip_local      	  [-]$RESET $OKGREEN  
+
+Select from the 'Vulnerability Scanning' menu:
+	
+	1 : Fatrat - $OKORANGE  FUD Backdoor Generator $RESET $OKGREEN
+	
+	99 : Return		
+	$RESET"
+	
+	echo -e "Holla! Your choice is? \c"
+	read  choice
+	
+	case "$choice" in
+	"1")
+		fatrat_module
+		;;
+	*)
+		#echo "Huhhh! Wrong input!"
+		init
+		;;
+	esac
+}
 
 
 function setup {
