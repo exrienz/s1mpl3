@@ -240,7 +240,7 @@ runSelfUpdate() {
 if mv "$0.tmp" "$0"; then
   echo "Done. Update complete."
   rm \$0
-  ./Simpl3.sh
+  ./S1mpl3.sh
 else
   echo "Failed!"
 fi
