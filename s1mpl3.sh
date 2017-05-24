@@ -199,7 +199,7 @@ function install_apps {
 	"openvas-start")
 		#Download and install OpenVas
 		install_message openvas &> /dev/null
-		xterm -e "apt-get update && apt-get upgrade && apt-get install openvas && openvas-setup" &
+		xterm -e "apt-get update -y && apt-get upgrade -y && apt-get install openvas && openvas-setup" &
 		wait
 		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"
 		;;
@@ -494,9 +494,10 @@ function arachni_module {
 
 	
 function open_vas_module {
-	xterm -hold -e 'echo -e "User Account	user: admin	pass: admin" & 
-	openvas-start &
-	openvasmd --user=admin --new-password=admin' &
+	xterm -hold -e 'echo -e "User Account	user: admin	pass: admin" && 
+	openvas-start &&
+	openvasmd --user=admin --new-password=admin &&
+	echo -e "In case of any error, please run "openvas-setup" commmand' &
 	#openvas-start
 	#openvas-stop
 	sleep 25
