@@ -224,7 +224,7 @@ runSelfUpdate() {
     echo "File requested: $UPDATE_BASE/$SELF"
     exit 1
   fi
-  echo "Update Success! Restarting Script..."
+  echo -n "Update Success! Restarting Script..."
   sleep 5
 
   # Copy over modes from old version
