@@ -39,6 +39,8 @@ declare -r wig_git='https://github.com/jekyc/wig.git'
 declare -r wig_folder='wig'
 
 declare -r arachni_git='https://github.com/Arachni/arachni/releases/download/v1.5.1/arachni-1.5.1-0.5.12-linux-x86_64.tar.gz'
+declare -r arachni_folder='arachni/bin'
+
 declare -r nessus_git='http://www.coco.oligococo.tk/file/Nessus-6.10.5-debian6_amd64.deb'
 
 declare -a required_apps=("nmap" 
@@ -47,9 +49,10 @@ declare -a required_apps=("nmap"
 						"fatrat" 
 						"./$application_path$metagoofil_folder/metagoofil.py" 
 						"./$application_path$wig_folder/wig.py"
-						"./Application/arachni/bin/arachni_web"
+						"./$application_path$arachni_folder/arachni_web"
 						"openvas-start"
-						"/etc/init.d/nessusd start")
+						"/etc/init.d/nessusd")
+						
 
 declare -a wordlist_path=("/usr/share/wordlists/wfuzz/general/common.txt"
 						"/usr/share/wordlists/wfuzz/general/medium.txt"
@@ -181,7 +184,7 @@ function install_apps {
 		wait
 		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"
 		;;
-	"./Application/arachni/bin/arachni_web")
+	"./$application_path$arachni_folder/arachni_web")
 		#Download and install arachni
 		install_message arachni
 		#Remove incase download error
@@ -190,10 +193,10 @@ function install_apps {
 		echo & echo
 		xterm -e "wget $arachni_git -P $application_path" &
 		wait
-		xterm -e "tar -xvzf $application_path/arachni-1.5.1-0.5.12-linux-x86_64.tar.gz -C $application_path &
-		mv $application_path/arachni-1.5.1-0.5.12 $application_path/arachni &
-		rm $application_path/arachni-1.5.1-0.5.12-linux-x86_64.tar.gz" &
+		xterm -hold -e "tar -xvzf $application_path/arachni-1.5.1-0.5.12-linux-x86_64.tar.gz -C $application_path" &
 		wait
+		mv $application_path/arachni-1.5.1-0.5.12 $application_path/arachni
+		rm $application_path/arachni-1.5.1-0.5.12-linux-x86_64.tar.gz
 		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"
 		;;
 	"openvas-start")
@@ -209,12 +212,12 @@ function install_apps {
 		wait
 		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"
 		;;
-	"/etc/init.d/nessusd start")
+	"/etc/init.d/nessusd")
 		#Remove corrupted downloaded file
-		rm $application_path/Nessus-6.10.5-debian6_amd64.deb &> /dev/null &
+		rm -f $application_path/Nessus-6.10.5-debian6_amd64.deb
 		#Download and install Nessus
 		install_message Nessus &> /dev/null
-		xterm -e "wget $nessus_git -P $application_path & dpkg -i $application_path/Nessus-6.10.5-debian6_amd64.deb" &
+		xterm -e "wget $nessus_git -P $application_path && dpkg -i $application_path/Nessus-6.10.5-debian6_amd64.deb" &
 		wait
 		rm $application_path/Nessus-6.10.5-debian6_amd64.deb
 		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"
@@ -501,10 +504,10 @@ function arachni_module {
 
 	
 function open_vas_module {
-	xterm -hold -e 'echo -e "User Account	user: admin	pass: admin" & 
-	openvas-start &
-	openvasmd --user=admin --new-password=admin &
-	echo -e "In case of any error, please run 'openvas-setup' commmand"' &
+	xterm -hold -e 'echo -e "User Account	user: admin	pass: admin" && 
+	echo -e "echo -e "In case of any error, please run '"openvas-setup"' commmand""
+	openvas-start &&
+	openvasmd --user=admin --new-password=admin' &
 	#openvas-start
 	#openvas-stop
 	sleep 25
@@ -528,7 +531,7 @@ function burpsuite_module {
 function nessus_module {
 	xterm -hold -e 'echo "For 1st time login:
     1. Register account
-    2. Enter licence, register from here : https://www.tenable.com/register" & 
+    2. Enter licence, register from here : https://www.tenable.com/register" && 
 	/etc/init.d/nessusd start' &
 	sleep 25
 	x-www-browser https://kali:8834/ &
