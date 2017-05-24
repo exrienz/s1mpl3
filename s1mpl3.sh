@@ -151,7 +151,7 @@ function install_apps {
 		chmod +x $application_path$fatrat_folder/setup.sh
 		xterm -e "./$application_path$fatrat_folder/setup.sh" &
 		wait
-		rm -r $application_path$fatrat_folder
+		#rm -r $application_path$fatrat_folder
 		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"		
 		;;
 	"./$application_path$metagoofil_folder/metagoofil.py")
@@ -177,8 +177,8 @@ function install_apps {
 		#Download and install arachni
 		install_message arachni
 		#Remove incase download error
-		rm $application_path/arachni-1.5.1-0.5.12-linux-x86_64.tar.gz
-		rm $application_path/arachni
+		rm $application_path/arachni-1.5.1-0.5.12-linux-x86_64.tar.gz &> /dev/null &
+		rm $application_path/arachni &> /dev/null &
 		echo & echo
 		xterm -e "wget $arachni_git -P $application_path" &
 		wait
@@ -197,7 +197,7 @@ function install_apps {
 		;;
 	"/etc/init.d/nessusd start")
 		#Remove corrupted downloaded file
-		rm $application_path/Nessus-6.10.5-debian6_amd64.deb
+		rm $application_path/Nessus-6.10.5-debian6_amd64.deb &> /dev/null &
 		#Download and install Nessus
 		install_message Nessus &> /dev/null
 		xterm -e "wget $nessus_git -P $application_path && dpkg -i $application_path/Nessus-6.10.5-debian6_amd64.deb" &
