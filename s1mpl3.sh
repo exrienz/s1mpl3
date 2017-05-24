@@ -224,7 +224,9 @@ runSelfUpdate() {
     echo "File requested: $UPDATE_BASE/$SELF"
     exit 1
   fi
-  echo -n "Update Success! Restarting Script..."
+  echo "Done"
+  
+  echo "Update Success! Restarting Script..."
   sleep 5
 
   # Copy over modes from old version
@@ -571,7 +573,7 @@ Select from the menu:
 	2 : Vulnerability Scanning
 	3 : Exploit
 	4 : Post Exploit # TODO
-	9 : Update Module
+	9 : Update $SELF Script
 	
 	99: Exit
 	$RESET"
