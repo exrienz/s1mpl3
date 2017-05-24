@@ -9,6 +9,11 @@
 #                                          
 #     
 
+#Auto Update Script
+set -o errexit
+UPDATE_BASE=https://raw.githubusercontent.com/exrienz/s1mpl3/master/s1mpl3.sh
+SELF=$(basename $0)
+
 declare -r ip_local=$(ip -4 route get 8.8.8.8 | awk {'print $7'} | tr -d '\n')
 
 declare -r application_path='Application/'
@@ -36,7 +41,6 @@ declare -r wig_folder='wig'
 declare -r arachni_git='https://github.com/Arachni/arachni/releases/download/v1.5.1/arachni-1.5.1-0.5.12-linux-x86_64.tar.gz'
 declare -r nessus_git='http://www.coco.oligococo.tk/file/Nessus-6.10.5-debian6_amd64.deb'
 
-
 declare -a required_apps=("nmap" 
 						"nikto" 
 						"sniper" 
@@ -45,8 +49,7 @@ declare -a required_apps=("nmap"
 						"./$application_path$wig_folder/wig.py"
 						"./Application/arachni/bin/arachni_web"
 						"openvas-start"
-						"/etc/init.d/nessusd start"
-						)
+						"/etc/init.d/nessusd start")
 
 declare -a wordlist_path=("/usr/share/wordlists/wfuzz/general/common.txt"
 						"/usr/share/wordlists/wfuzz/general/medium.txt"
@@ -81,11 +84,39 @@ function install_git {
 	wait
 	}
 
+	
 function install_message {
 	#Download and install nmap
 	echo -e "$OKGREEN	[-]::[Installing]: Downloading $1..Please Wait.... $RESET"
 	}
 
+	
+function create_dir (){
+	mkdir -p $report_path$1
+	}
+
+
+function wordlist (){
+	echo
+	echo -e "$OKORANGE	Common Wordlist Path: $RESET"
+	echo "	"
+	for i in "${wordlist_path[@]}"
+		do
+			echo -e "$OKORANGE	$i $RESET"
+		done
+	echo
+	}
+
+	
+#Convert XML to HTML
+function xml2html () {
+	xsltproc $report_path$1/$2.xml -o $report_path$1/$2.html 2> /dev/null
+	rm $report_path$1/$2.xml 2> /dev/null
+	x-www-browser $report_path$1/$2.html 2> /dev/null &
+	}
+
+	
+#Install missing application
 function install_apps {
 	case "$1" in
 	"nmap")
@@ -145,6 +176,9 @@ function install_apps {
 	"./Application/arachni/bin/arachni_web")
 		#Download and install arachni
 		install_message arachni
+		#Remove incase download error
+		rm $application_path/arachni-1.5.1-0.5.12-linux-x86_64.tar.gz
+		rm $application_path/arachni
 		echo & echo
 		xterm -e "wget $arachni_git -P $application_path" &
 		wait
@@ -157,11 +191,13 @@ function install_apps {
 	"openvas-start")
 		#Download and install OpenVas
 		install_message openvas &> /dev/null
-		xterm -e "apt-get install openvas && openvas-setup" &
+		xterm -e "apt-get update && apt-get upgrade && apt-get install openvas && openvas-setup" &
 		wait
 		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"
 		;;
 	"/etc/init.d/nessusd start")
+		#Remove corrupted downloaded file
+		rm $application_path/Nessus-6.10.5-debian6_amd64.deb
 		#Download and install Nessus
 		install_message Nessus &> /dev/null
 		xterm -e "wget $nessus_git -P $application_path && dpkg -i $application_path/Nessus-6.10.5-debian6_amd64.deb" &
@@ -175,32 +211,43 @@ function install_apps {
 		echo ""
 		;;
 	esac	
-}
-
-function create_dir (){
-	mkdir -p $report_path$1
-}
-
-function wordlist (){
-	echo
-	echo -e "$OKORANGE	Common Wordlist Path: $RESET"
-	echo "	"
-	for i in "${wordlist_path[@]}"
-		do
-			echo -e "$OKORANGE	$i $RESET"
-		done
-	echo
-}
-
-
-# arg1 = host	arg2 = output
-function xml2html () {
-	xsltproc $report_path$1/$2.xml -o $report_path$1/$2.html 2> /dev/null
-	rm $report_path$1/$2.xml 2> /dev/null
-	x-www-browser $report_path$1/$2.html 2> /dev/null &
 	}
+	
+	
+runSelfUpdate() {
+  echo "Performing self-update..."
 
+  # Download new version
+  echo -n "Downloading latest version..."
+  if ! wget --quiet --output-document="$0.tmp" $UPDATE_BASE > $SELF ; then
+    echo "Failed: Error while trying to wget new version!"
+    echo "File requested: $UPDATE_BASE/$SELF"
+    exit 1
+  fi
+  echo "Done."
 
+  # Copy over modes from old version
+  OCTAL_MODE=$(stat -c '%a' $SELF)
+  if ! chmod $OCTAL_MODE "$0.tmp" ; then
+    echo "Failed: Error while trying to set mode on $0.tmp."
+    exit 1
+  fi
+
+  # Spawn update script
+  cat > updateScript.sh << EOF
+#!/bin/bash
+# Overwrite old file with new
+if mv "$0.tmp" "$0"; then
+  echo "Done. Update complete."
+  rm \$0
+  ./Simpl3.sh
+else
+  echo "Failed!"
+fi
+EOF
+  echo -n "Inserting update process..."
+  exec /bin/bash updateScript.sh
+}
 
 #    _____                        __  __           _       _      
 #   |  __ \                      |  \/  |         | |     | |     
@@ -210,7 +257,6 @@ function xml2html () {
 #   |_|  \_\___|\___\___/|_| |_| |_|  |_|\___/ \__,_|\__,_|_|\___|
 #                                                                 
 #                                                                 
-
 
 function nmap_module {
 	echo -e "What is your host? \c"
@@ -438,8 +484,8 @@ function arachni_module {
 	
 function open_vas_module {
 	xterm -hold -e 'echo -e "User Account	user: admin	pass: admin" & 
-	openvasmd --user=admin --new-password=admin &
-	openvas-start' &
+	openvas-start &
+	openvasmd --user=admin --new-password=admin' &
 	#openvas-start
 	#openvas-stop
 	sleep 25
@@ -496,18 +542,20 @@ function fatrat_module {
 #                                               
 #                                               
 
+# Main Logo
 function main_logo {
-clear && echo -en "\e[3J"
-echo ""
-echo -e "$OKRED███████╗ ██╗███╗   ███╗██████╗ ██╗     ██████╗   $RESET"
-echo -e "$OKRED██╔════╝███║████╗ ████║██╔══██╗██║     ╚════██╗  $RESET"
-echo -e "$OKRED███████╗╚██║██╔████╔██║██████╔╝██║      █████╔╝  $RESET"
-echo -e "$OKRED╚════██║ ██║██║╚██╔╝██║██╔═══╝ ██║      ╚═══██╗  $RESET"
-echo -e "$OKRED███████║ ██║██║ ╚═╝ ██║██║     ███████╗██████╔╝  $RESET"
-echo -e "$OKRED╚══════╝ ╚═╝╚═╝     ╚═╝╚═╝     ╚══════╝╚═════╝x64B1T	$RESET"
-}
+	clear && echo -en "\e[3J"
+	echo ""
+	echo -e "$OKRED███████╗ ██╗███╗   ███╗██████╗ ██╗     ██████╗   $RESET"
+	echo -e "$OKRED██╔════╝███║████╗ ████║██╔══██╗██║     ╚════██╗  $RESET"
+	echo -e "$OKRED███████╗╚██║██╔████╔██║██████╔╝██║      █████╔╝  $RESET"
+	echo -e "$OKRED╚════██║ ██║██║╚██╔╝██║██╔═══╝ ██║      ╚═══██╗  $RESET"
+	echo -e "$OKRED███████║ ██║██║ ╚═╝ ██║██║     ███████╗██████╔╝  $RESET"
+	echo -e "$OKRED╚══════╝ ╚═╝╚═╝     ╚═╝╚═╝     ╚══════╝╚═════╝x64B1T	$RESET"
+	}
 
 
+# Landing Page Interface
 function init {
 	main_logo
 	echo -e "$OKGREEN
@@ -522,7 +570,7 @@ Select from the menu:
 	2 : Vulnerability Scanning
 	3 : Exploit
 	4 : Post Exploit # TODO
-	9 : Update Module # TODO
+	9 : Update Module
 	
 	99: Exit
 	$RESET"
@@ -540,13 +588,18 @@ Select from the menu:
 	"3")
 		exploit_interface
 		;;
+	"9")
+		runSelfUpdate
+		;;
 	*)
 		echo "Arigatou! Sayonara~"
 		exit
 		;;
 	esac
-}
+	}
 
+
+# Reconnaisance Interface
 function recon {
 	main_logo
 	echo -e "$OKGREEN
@@ -614,8 +667,10 @@ Select from the 'Reconnaisance' menu:
 		init
 		;;
 	esac
-}
+	}
 
+
+#Nmap Interface	
 function nmap_interface {
 	main_logo
 	echo -e "$OKGREEN
@@ -671,6 +726,7 @@ Select from the 'Nmap command' menu:
 }
 
 
+#Vulnerability Scanning Interface
 function va_scanning {
 	main_logo
 	echo -e "$OKGREEN
@@ -714,6 +770,7 @@ Select from the 'Vulnerability Scanning' menu:
 }
 
 
+#Exploit Interface
 function exploit_interface {
 	main_logo
 	echo -e "$OKGREEN
@@ -744,6 +801,7 @@ Select from the 'Vulnerability Scanning' menu:
 }
 
 
+#Dependency Check
 function setup {
 	main_logo
 	echo ""
@@ -761,6 +819,7 @@ function setup {
 		done
 		}
 
+		
 #    __  __       _       
 #   |  \/  |     (_)      
 #   | \  / | __ _ _ _ __  
