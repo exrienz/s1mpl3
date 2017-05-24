@@ -128,7 +128,7 @@ function install_apps {
 	"nikto")
 		#Download and install nikto	
 		install_message $1
-		xterm -e "apt-get install nikto && yes" &
+		xterm -e "apt-get install nikto & yes" &
 		wait
 		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"
 		;;
@@ -138,7 +138,7 @@ function install_apps {
 		install_git $sniper_git $sniper_folder
 		chmod 777 $application_path$sniper_folder/install.sh &> /dev/null
 		chmod 777 $application_path$sniper_folder/sniper.sh &> /dev/null
-		xterm -e "./$application_path$sniper_folder/install.sh && yes && y" &
+		xterm -e "./$application_path$sniper_folder/install.sh & yes & y" &
 		wait
 		rm -r $application_path$sniper_folder
 		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"		
@@ -190,8 +190,8 @@ function install_apps {
 		echo & echo
 		xterm -e "wget $arachni_git -P $application_path" &
 		wait
-		xterm -e "tar -xvzf $application_path/arachni-1.5.1-0.5.12-linux-x86_64.tar.gz -C $application_path &&	
-		mv $application_path/arachni-1.5.1-0.5.12 $application_path/arachni && 
+		xterm -e "tar -xvzf $application_path/arachni-1.5.1-0.5.12-linux-x86_64.tar.gz -C $application_path &
+		mv $application_path/arachni-1.5.1-0.5.12 $application_path/arachni &
 		rm $application_path/arachni-1.5.1-0.5.12-linux-x86_64.tar.gz" &
 		wait
 		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"
@@ -199,7 +199,13 @@ function install_apps {
 	"openvas-start")
 		#Download and install OpenVas
 		install_message openvas &> /dev/null
-		xterm -e "apt-get update -y && apt-get upgrade -y && apt-get install openvas && openvas-setup" &
+		xterm -e "apt-get update -y" &
+		wait
+		xterm -e "apt-get upgrade -y" &
+		wait
+		xterm -e "apt-get install openvas" &
+		wait
+		xterm -e "openvas-setup" &
 		wait
 		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"
 		;;
@@ -208,7 +214,7 @@ function install_apps {
 		rm $application_path/Nessus-6.10.5-debian6_amd64.deb &> /dev/null &
 		#Download and install Nessus
 		install_message Nessus &> /dev/null
-		xterm -e "wget $nessus_git -P $application_path && dpkg -i $application_path/Nessus-6.10.5-debian6_amd64.deb" &
+		xterm -e "wget $nessus_git -P $application_path & dpkg -i $application_path/Nessus-6.10.5-debian6_amd64.deb" &
 		wait
 		rm $application_path/Nessus-6.10.5-debian6_amd64.deb
 		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"
