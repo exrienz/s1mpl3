@@ -146,11 +146,19 @@ function install_apps {
 	"fatrat")
 		#Download and install fatrat
 		install_message $1
-		install_git $fatrat_git $fatrat_folder
-		chmod +x $application_path$fatrat_folder/powerfull.sh
-		chmod +x $application_path$fatrat_folder/setup.sh
-		xterm -e "./$application_path$fatrat_folder/setup.sh" &
-		wait
+
+		if [ -d "$application_path$fatrat" ]; then
+		  # if true this block of code will execute
+			xterm -e "./$application_path$fatrat_folder/setup.sh" &
+			wait
+		else
+			install_git $fatrat_git $fatrat_folder
+			chmod +x $application_path$fatrat_folder/powerfull.sh
+			chmod +x $application_path$fatrat_folder/setup.sh
+			xterm -e "./$application_path$fatrat_folder/setup.sh" &
+			wait
+		fi
+			
 		#rm -r $application_path$fatrat_folder
 		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"		
 		;;
