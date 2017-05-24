@@ -497,7 +497,7 @@ function open_vas_module {
 	xterm -hold -e 'echo -e "User Account	user: admin	pass: admin" & 
 	openvas-start &
 	openvasmd --user=admin --new-password=admin &
-	echo -e "In case of any error, please run "openvas-setup" commmand' &
+	echo -e "In case of any error, please run /"openvas-setup/" commmand"' &
 	#openvas-start
 	#openvas-stop
 	sleep 25
