@@ -199,11 +199,11 @@ function install_apps {
 	"openvas-start")
 		#Download and install OpenVas
 		install_message openvas &> /dev/null
-		xterm -e "apt-get update -y" &
-		wait
-		xterm -e "apt-get upgrade -y" &
-		wait
-		xterm -e "apt-get install openvas" &
+		#xterm -e "apt-get update -y" &
+		#wait
+		#xterm -e "apt-get upgrade -y" &
+		#wait
+		xterm -e "apt-get -y install openvas" &
 		wait
 		xterm -e "openvas-setup" &
 		wait
@@ -263,6 +263,7 @@ else
 fi
 EOF
 	echo -n "Inserting update process..."
+	chmod +x updateScript.sh
 	exec /bin/bash updateScript.sh
 	}
 
