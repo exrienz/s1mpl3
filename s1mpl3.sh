@@ -222,6 +222,7 @@ runSelfUpdate() {
   if ! wget --quiet --output-document="$0.tmp" $UPDATE_BASE > $SELF ; then
     echo "Failed: Error while trying to wget new version!"
     echo "File requested: $UPDATE_BASE/$SELF"
+	sleep 5
     exit 1
   fi
   echo "Done."
