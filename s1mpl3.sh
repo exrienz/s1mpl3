@@ -484,8 +484,8 @@ function cewl_module {
 #                                         |___/                                   
 
 function arachni_module {
-	xterm -hold -e 'echo -e "Admin Account	:--- user: admin@admin.admin	pass: administrator" && 
-	echo -e "User Account	:--- user: user@user.user	pass: regular_user" && 
+	xterm -hold -e 'echo -e "Admin Account	:--- user: admin@admin.admin	pass: administrator" &
+	echo -e "User Account	:--- user: user@user.user	pass: regular_user" &
 	./Application/arachni/bin/arachni_web' &
 	sleep 25
 	x-www-browser http://localhost:9292 &
@@ -494,9 +494,9 @@ function arachni_module {
 
 	
 function open_vas_module {
-	xterm -hold -e 'echo -e "User Account	user: admin	pass: admin" && 
-	openvas-start &&
-	openvasmd --user=admin --new-password=admin &&
+	xterm -hold -e 'echo -e "User Account	user: admin	pass: admin" & 
+	openvas-start &
+	openvasmd --user=admin --new-password=admin &
 	echo -e "In case of any error, please run "openvas-setup" commmand' &
 	#openvas-start
 	#openvas-stop
@@ -509,8 +509,8 @@ function open_vas_module {
 function burpsuite_module {
 	xterm -hold -e 'echo "
 	DONT CLOSE THIS WINDOW!
-	Please set proxy to 127.0.0.1:8080 and enable intercept mode" && 
-	echo &&
+	Please set proxy to 127.0.0.1:8080 and enable intercept mode" & 
+	echo &
 	burpsuite'&
 	sleep 25
 	x-www-browser &
@@ -521,8 +521,8 @@ function burpsuite_module {
 function nessus_module {
 	xterm -hold -e 'echo "For 1st time login:
     1. Register account
-    2. Enter licence, register from here : https://www.tenable.com/register
-	" && /etc/init.d/nessusd start' &
+    2. Enter licence, register from here : https://www.tenable.com/register" & 
+	/etc/init.d/nessusd start' &
 	sleep 25
 	x-www-browser https://kali:8834/ &
 	va_scanning
