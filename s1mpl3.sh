@@ -138,7 +138,7 @@ function install_apps {
 		install_git $sniper_git $sniper_folder
 		chmod 777 $application_path$sniper_folder/install.sh &> /dev/null
 		chmod 777 $application_path$sniper_folder/sniper.sh &> /dev/null
-		xterm -e "./$application_path$sniper_folder/install.sh && yes" &
+		xterm -e "./$application_path$sniper_folder/install.sh && yes && y" &
 		wait
 		rm -r $application_path$sniper_folder
 		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"		
