@@ -26,7 +26,7 @@ declare -r nmap_folder='nmap'
 declare -r nikto_git='https://github.com/sullo/nikto.git'
 declare -r nikto_folder='nikto'
 
-declare -r sniper_git='https://github.com/1N3/Sn1per'
+declare -r sniper_git='https://github.com/1N3/Sn1per.git'
 declare -r sniper_folder='Sn1per'
 
 declare -r fatrat_git='https://github.com/Screetsec/TheFatRat.git'
@@ -121,14 +121,14 @@ function install_apps {
 	case "$1" in
 	"nmap")
 		install_message $1
-		xterm -e "apt-get install nmap & yes" &
+		xterm -e "apt-get install nmap && yes" &
 		wait
 		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"
 		;;
 	"nikto")
 		#Download and install nikto	
 		install_message $1
-		xterm -e "apt-get install nikto & yes" &
+		xterm -e "apt-get install nikto && yes" &
 		wait
 		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"
 		;;
@@ -138,7 +138,7 @@ function install_apps {
 		install_git $sniper_git $sniper_folder
 		chmod 777 $application_path$sniper_folder/install.sh &> /dev/null
 		chmod 777 $application_path$sniper_folder/sniper.sh &> /dev/null
-		xterm -e "./$application_path$sniper_folder/install.sh & yes" &
+		xterm -e "./$application_path$sniper_folder/install.sh && yes" &
 		wait
 		rm -r $application_path$sniper_folder
 		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"		
@@ -215,29 +215,29 @@ function install_apps {
 	
 	
 runSelfUpdate() {
-  echo "Performing self-update..."
+	echo "Performing self-update..."
 
-  # Download new version
-  echo -n "Downloading latest version..."
-  if ! wget --quiet --output-document="$0.tmp" $UPDATE_BASE > $SELF ; then
-    echo "Failed: Error while trying to wget new version!"
-    echo "File requested: $UPDATE_BASE/$SELF"
-    exit 1
-  fi
-  echo "Done"
+	# Download new version
+	echo -n "Downloading latest version..."
+	if ! wget --quiet --output-document="$0.tmp" $UPDATE_BASE > $SELF ; then
+		echo "Failed: Error while trying to wget new version!"
+		echo "File requested: $UPDATE_BASE/$SELF"
+		exit 1
+	fi
+	echo "Done"
   
-  echo "Update Success! Restarting Script..."
-  sleep 5
+	echo "Update Success! Restarting Script..."
+	sleep 5
 
-  # Copy over modes from old version
-  OCTAL_MODE=$(stat -c '%a' $SELF)
-  if ! chmod $OCTAL_MODE "$0.tmp" ; then
-    echo "Failed: Error while trying to set mode on $0.tmp."
-    exit 1
-  fi
+	# Copy over modes from old version
+	OCTAL_MODE=$(stat -c '%a' $SELF)
+	if ! chmod $OCTAL_MODE "$0.tmp" ; then
+		echo "Failed: Error while trying to set mode on $0.tmp."
+		exit 1
+	fi
 
-  # Spawn update script
-  cat > updateScript.sh << EOF
+	# Spawn update script
+	cat > updateScript.sh << EOF
 #!/bin/bash
 # Overwrite old file with new
 if mv "$0.tmp" "$0"; then
@@ -248,9 +248,9 @@ else
   echo "Failed!"
 fi
 EOF
-  echo -n "Inserting update process..."
-  exec /bin/bash updateScript.sh
-}
+	echo -n "Inserting update process..."
+	exec /bin/bash updateScript.sh
+	}
 
 #    _____                        __  __           _       _      
 #   |  __ \                      |  \/  |         | |     | |     
