@@ -688,7 +688,6 @@ Select from the menu:
 	1 : Reconnaisance
 	2 : Vulnerability Scanning
 	3 : Exploit
-	4 : Post Exploit # TODO
 	9 : Update $SELF script
 	
 	99: Exit
