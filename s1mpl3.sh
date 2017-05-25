@@ -218,19 +218,6 @@ function install_apps {
 		rm $application_path/arachni-1.5.1-0.5.12-linux-x86_64.tar.gz
 		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"
 		;;
-	"openvas-start")
-		#Download and install OpenVas
-		install_message openvas &> /dev/null
-		#xterm -e "apt-get update -y" &
-		#wait
-		#xterm -e "apt-get upgrade -y" &
-		#wait
-		xterm -e "apt-get -y install openvas" &
-		wait
-		xterm -e "openvas-setup" &
-		wait
-		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"
-		;;
 	"/etc/init.d/nessusd")
 		#Remove corrupted downloaded file
 		rm -f $application_path/Nessus-6.10.5-debian6_amd64.deb
@@ -882,9 +869,33 @@ Select from the 'Vulnerability Scanning' menu:
 	"1")
 		arachni_module
 		;;
-	"2")
-		#open_vas_module
-		va_scanning
+	"2")	
+		#Check Openvas if installed	
+		if apps_exist "openvas-start" ; then
+			#Execute OpenVas
+			open_vas_module
+		else
+			echo -e "OpenVas module is not available, do you want to install now? y/n \c"
+			read actions
+			case "$actions" in
+			"y")
+				#Download and install OpenVas
+				install_message openvas &> /dev/null
+				#xterm -e "apt-get update -y" &
+				#wait
+				#xterm -e "apt-get upgrade -y" &
+				#wait
+				xterm -e "apt-get -y install openvas" &
+				wait
+				xterm -e "openvas-setup" &
+				wait
+				echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"
+				va_scanning
+				;;
+			*)
+				va_scanning
+				;;
+		fi
 		;;
 	"3")
 		nessus_module
