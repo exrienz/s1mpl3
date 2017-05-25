@@ -519,20 +519,6 @@ function http_method_module {
 	xdg-open $report_path$hosts/$output.txt 2> /dev/null &
 	recon
 	}	
-		
-
-function cewl_module {
-	echo -e "What is your host?  \c"
-	read hosts
-	output="Possible_Password"
-	mkdir -p $report_path$hosts 2> /dev/null
-	echo "" > $report_path$hosts/$output.txt
-	xterm -e "cewl -w $report_path$hosts/$output.txt -d 5 -m 7 $hosts" &
-	wait
-	echo
-	xdg-open $report_path$hosts/$output.txt 2> /dev/null &
-	recon
-	}
 
 
 #     _____                       _               __  __           _       _      
@@ -766,7 +752,6 @@ Select from the 'Reconnaisance' menu:
 	8  : HTTP Method Analyzer - $OKORANGE Http Method Analyzer $RESET $OKGREEN
 	9  : Maltego - $OKORANGE Reconnaissance framework $RESET $OKGREEN
 	10 : Recon-Ng - $OKORANGE Web Reconnaissance framework $RESET $OKGREEN
-	11 : Cewl - $OKORANGE Possible Password List Generator $RESET $OKGREEN
 	
 	99 : Return		
 	$RESET"
@@ -804,9 +789,6 @@ Select from the 'Reconnaisance' menu:
 		;;
 	"10")
 		reconng_module
-		;;
-	"11")
-		cewl_module
 		;;
 	*)
 		#echo "Huhhh! Wrong input!"
@@ -885,7 +867,7 @@ function va_scanning {
 Select from the 'Vulnerability Scanning' menu:
 	
 	1 : Arachni - $OKORANGE  Web Application Security Scanner $RESET $OKGREEN
-	2 : Openvas - $OKORANGE Vulnerability Scanning and Management Solution $RESET $OKGREEN
+	2 : Openvas - $OKORANGE (Halted!) Vulnerability Scanning $RESET $OKGREEN
 	3 : Nessus - $OKORANGE Vulnerability Scanning Tool $RESET $OKGREEN
 	4 : Burpsuit - $OKORANGE  Toolkit for Web Application Security Testing $RESET $OKGREEN
 	5 : CMS Vulnerability Scanner - $OKORANGE Wordpress,Joomla,Drupal,Liferay  $RESET $OKGREEN
@@ -901,7 +883,8 @@ Select from the 'Vulnerability Scanning' menu:
 		arachni_module
 		;;
 	"2")
-		open_vas_module
+		#open_vas_module
+		va_scanning
 		;;
 	"3")
 		nessus_module
