@@ -164,25 +164,6 @@ function install_apps {
 		rm -r $application_path$sniper_folder
 		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"		
 		;;
-	"fatrat")
-		#Download and install fatrat
-		install_message $1
-
-		if [ -d "$application_path$fatrat" ]; then
-		  # if true this block of code will execute
-			xterm -e "./$application_path$fatrat_folder/setup.sh" &
-			wait
-		else
-			install_git $fatrat_git $fatrat_folder
-			chmod +x $application_path$fatrat_folder/powerfull.sh
-			chmod +x $application_path$fatrat_folder/setup.sh
-			xterm -e "./$application_path$fatrat_folder/setup.sh" &
-			wait
-		fi
-			
-		#rm -r $application_path$fatrat_folder
-		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"		
-		;;
 	"./$application_path$metagoofil_folder/metagoofil.py")
 		#Download and install Metagoofil
 		install_message metagoofil
@@ -873,7 +854,7 @@ Select from the 'Vulnerability Scanning' menu:
 			#Execute OpenVas
 			open_vas_module
 		else
-			echo -e "OpenVas module is not available, do you want to install now? y/n \c"
+			echo -e "OpenVas module is not available, install now? y/n \c"
 			read actions
 			case "$actions" in
 			"y")
@@ -883,11 +864,11 @@ Select from the 'Vulnerability Scanning' menu:
 				#wait
 				#xterm -e "apt-get upgrade -y" &
 				#wait
-				xterm -e "apt-get -y install openvas" &
+				xterm -e "apt-get install openvas" &
 				wait
 				xterm -e "openvas-setup" &
 				wait
-				echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"
+				echo -e "$OKGREEN	[✔-OK!]::[Apps]: OpenVas $RESET"
 				va_scanning
 				;;
 			*)
@@ -976,8 +957,38 @@ Select from the 'Vulnerability Scanning' menu:
 	read  choice
 	
 	case "$choice" in
-	"1")
-		fatrat_module
+	"1")		
+		#Check Fatrat if installed	
+		if apps_exist "fatrat" ; then
+			#Execute OpenVas
+			fatrat_module
+		else
+			echo -e "Fatrat module is not available, install now? y/n \c"
+			read actions
+			case "$actions" in
+			"y")
+				#Download and install fatrat
+				install_message Fatrat
+				if [ -d "$application_path$fatrat" ]; then
+				  # if true this block of code will execute
+					xterm -e "./$application_path$fatrat_folder/setup.sh" &
+					wait
+				else
+					install_git $fatrat_git $fatrat_folder
+					chmod +x $application_path$fatrat_folder/powerfull.sh
+					chmod +x $application_path$fatrat_folder/setup.sh
+					xterm -e "./$application_path$fatrat_folder/setup.sh" &
+					wait
+				fi
+				#rm -r $application_path$fatrat_folder
+				echo -e "$OKGREEN	[✔-OK!]::[Apps]: Fatrat $RESET"	
+				exploit_interface
+				;;
+			*)
+				exploit_interface
+				;;
+			esac
+		fi
 		;;
 	*)
 		#echo "Huhhh! Wrong input!"
