@@ -20,7 +20,7 @@ default_directory=`pwd`
 
 declare -r ip_local=$(ip -4 route get 8.8.8.8 | awk {'print $7'} | tr -d '\n')
 
-declare -r app_version='V 5.0 (x64)'
+declare -r app_version='V 5.1'
 
 declare -r application_path='Application/'
 declare -r report_path='Report/'
@@ -298,7 +298,7 @@ EOF
 #                                                                 
 
 function nmap_module {
-	echo -e "What is your host? \c"
+	echo -e "What is your host? e.g. www.example.com  \c"
 	read hosts
 	mkdir -p $report_path$hosts 2> /dev/null
 	output="Nmap_Intense_Scan_Report"
@@ -309,7 +309,7 @@ function nmap_module {
 
 	
 function nmap_udp_module {
-	echo -e "What is your host? \c"
+	echo -e "What is your host? e.g. www.example.com  \c"
 	read hosts
 	mkdir -p $report_path$hosts 2> /dev/null
 	output="Nmap_UDP_Scan_Report"
@@ -320,7 +320,7 @@ function nmap_udp_module {
 
 	
 function nmap_aio_enum_module {
-	echo -e "What is your host? \c"
+	echo -e "What is your host? e.g. www.example.com  \c"
 	read hosts
 	echo -e "What is your http port? \c"
 	read portz
@@ -333,7 +333,7 @@ function nmap_aio_enum_module {
 	
 
 function nmap_aio_cve_module {
-	echo -e "What is your host? \c"
+	echo -e "What is your host? e.g. www.example.com  \c"
 	read hosts
 	mkdir -p $report_path$hosts 2> /dev/null
 	output="Nmap_Http_CVE_Scan_Report"
@@ -344,7 +344,7 @@ function nmap_aio_cve_module {
 
 	
 function nmap_aio_ssl_module {
-	echo -e "What is your host? \c"
+	echo -e "What is your host? e.g. www.example.com  \c"
 	read hosts
 	echo -e "What is your ssl port? \c"
 	read port
@@ -357,7 +357,7 @@ function nmap_aio_ssl_module {
 
 	
 function nmap_smb_module {
-	echo -e "What is your host? \c"
+	echo -e "What is your host? e.g. www.example.com  \c"
 	read hosts
 	mkdir -p $report_path$hosts 2> /dev/null
 	output="Nmap_SMB_Scan_Report"
@@ -368,7 +368,7 @@ function nmap_smb_module {
 	
 	
 function metagofil_module {
-	echo -e "What is your host? \c"
+	echo -e "What is your host? e.g. www.example.com  \c"
 	read hosts
 	echo -e "Enter filetype separated by comma (e.g:- pdf, doc, xls,ppt,etc): \c"
 	read files
@@ -381,9 +381,19 @@ function metagofil_module {
 
 	
 function sniper_module {
-	echo -e "What is your host? \c"
+	echo -e "What is your host? e.g. www.example.com  \c"
 	read hosts
-	sniper $hosts
+	mkdir -p $report_path$hosts/sn1per_output 2> /dev/null
+	xterm -e "sniper $hosts" &
+	wait
+	cp -r -f -v /usr/share/sniper/loot/ $report_path$hosts/sn1per_output
+	rm -r /usr/share/sniper/loot/
+	mkdir -p /usr/share/sniper/loot
+	mkdir -p /usr/share/sniper/loot/domains
+	mkdir -p /usr/share/sniper/loot/nmap
+	mkdir -p /usr/share/sniper/loot/output
+	mkdir -p /usr/share/sniper/loot/reports
+	mkdir -p /usr/share/sniper/loot/screenshots
 	recon
 	}
 	
@@ -391,7 +401,7 @@ function sniper_module {
 function brute_dir_module {
 	echo -e "Http or Https? \c"
 	read protocols
-	echo -e "What is your host?  \c"
+	echo -e "What is your host? e.g. www.example.com  \c"
 	read hosts
 	wordlist
 	echo -e "Use wordlist path:  \c"
@@ -410,7 +420,7 @@ function brute_dir_module {
 function nikto_module {
 	echo -e "Http or Https? \c"
 	read protocols
-	echo -e "What is your host?  \c"
+	echo -e "What is your host? e.g. www.example.com  \c"
 	read hosts
 	output="Nikto_Report"
 	nikto -h $protocols://$hosts -F htm -output $output.html
@@ -423,7 +433,7 @@ function nikto_module {
 function wig_module {
 	echo -e "Http or Https? \c"
 	read protocols
-	echo -e "What is your host?  \c"
+	echo -e "What is your host? e.g. www.example.com  \c"
 	read hosts
 	output="CMS_Identifier_Report"
 	mkdir -p $report_path$hosts 2> /dev/null
