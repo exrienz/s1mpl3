@@ -527,7 +527,8 @@ function cewl_module {
 	output="Possible_Password"
 	mkdir -p $report_path$hosts 2> /dev/null
 	echo "" > $report_path$hosts/$output.txt
-	cewl -w $report_path$hosts/$output.txt -d 5 -m 7 $hosts
+	xterm -e "cewl -w $report_path$hosts/$output.txt -d 5 -m 7 $hosts" &
+	wait
 	echo
 	xdg-open $report_path$hosts/$output.txt 2> /dev/null &
 	recon
@@ -591,7 +592,7 @@ function nessus_module {
 
 function wpscan_module {
 	
-	echo -e "What is your host?  \c"
+	echo -e "What is your host? e.g. www.example.com  \c"
 	read hosts
 	
 	echo -e "$OKGREEN
