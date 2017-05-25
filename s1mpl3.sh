@@ -20,7 +20,7 @@ default_directory=`pwd`
 
 declare -r ip_local=$(ip -4 route get 8.8.8.8 | awk {'print $7'} | tr -d '\n')
 
-declare -r app_version='V 5.1'
+declare -r app_version='V 5.2'
 
 declare -r application_path='Application/'
 declare -r report_path='Report/'
@@ -522,6 +522,7 @@ function open_vas_module {
 	xterm -hold -e 'echo -e "User Account	user: admin	pass: admin" && 
 	echo -e "echo -e "In case of any error, please run '"openvas-setup"' commmand""
 	openvas-start &&
+	openvasmd --create-user admin &&
 	openvasmd --user=admin --new-password=admin' &
 	#openvas-start
 	#openvas-stop
