@@ -14,6 +14,10 @@ set -o errexit
 UPDATE_BASE=https://raw.githubusercontent.com/exrienz/s1mpl3/master/s1mpl3.sh
 SELF=$(basename $0)
 
+reldir=`dirname $0`
+cd $reldir
+default_directory=`pwd`
+
 declare -r ip_local=$(ip -4 route get 8.8.8.8 | awk {'print $7'} | tr -d '\n')
 
 declare -r application_path='Application/'
@@ -41,6 +45,17 @@ declare -r wig_folder='wig'
 declare -r arachni_git='https://github.com/Arachni/arachni/releases/download/v1.5.1/arachni-1.5.1-0.5.12-linux-x86_64.tar.gz'
 declare -r arachni_folder='arachni/bin'
 
+declare -r joomlavs_git='https://github.com/rastating/joomlavs.git'
+declare -r joomlavs_folder='joomlavs'
+
+declare -r droopescan_git='https://github.com/droope/droopescan.git'
+declare -r droopescan_folder='droopescan'
+
+declare -r liferayscan_git='https://github.com/bcoles/LiferayScan.git'
+declare -r liferayscan_folder='LiferayScan/bin'
+declare -r liferayscan_folder_main='LiferayScan'
+
+
 declare -r nessus_git='http://www.coco.oligococo.tk/file/Nessus-6.10.5-debian6_amd64.deb'
 
 declare -a required_apps=("nmap" 
@@ -50,8 +65,12 @@ declare -a required_apps=("nmap"
 						"./$application_path$metagoofil_folder/metagoofil.py" 
 						"./$application_path$wig_folder/wig.py"
 						"./$application_path$arachni_folder/arachni_web"
-						"openvas-start"
-						"/etc/init.d/nessusd")
+						#"openvas-start"
+						"/etc/init.d/nessusd"
+						"./$application_path$joomlavs_folder/joomlavs.rb"
+						"./$application_path$liferayscan_folder/LiferayScan"
+						"./$application_path$droopescan_folder/droopescan"
+						)
 						
 
 declare -a wordlist_path=("/usr/share/wordlists/wfuzz/general/common.txt"
@@ -182,18 +201,18 @@ function install_apps {
 		chmod +x setup.py wig.py &> /dev/null
 		xterm -e "python $application_path$wig_folder/setup.py install"  &
 		wait
+		cd $default_directory
 		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"
 		;;
 	"./$application_path$arachni_folder/arachni_web")
 		#Download and install arachni
 		install_message arachni
 		#Remove incase download error
-		rm $application_path/arachni-1.5.1-0.5.12-linux-x86_64.tar.gz &> /dev/null &
-		rm $application_path/arachni &> /dev/null &
-		echo & echo
+		rm -f $application_path/arachni-1.5.1-0.5.12-linux-x86_64.tar.gz 
+		rm -f -r $application_path/arachni
 		xterm -e "wget $arachni_git -P $application_path" &
 		wait
-		xterm -hold -e "tar -xvzf $application_path/arachni-1.5.1-0.5.12-linux-x86_64.tar.gz -C $application_path" &
+		xterm -e "tar -xvzf $application_path/arachni-1.5.1-0.5.12-linux-x86_64.tar.gz -C $application_path" &
 		wait
 		mv $application_path/arachni-1.5.1-0.5.12 $application_path/arachni
 		rm $application_path/arachni-1.5.1-0.5.12-linux-x86_64.tar.gz
@@ -220,6 +239,37 @@ function install_apps {
 		xterm -e "wget $nessus_git -P $application_path && dpkg -i $application_path/Nessus-6.10.5-debian6_amd64.deb" &
 		wait
 		rm $application_path/Nessus-6.10.5-debian6_amd64.deb
+		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"
+		;;
+	"./$application_path$joomlavs_folder/joomlavs.rb")
+		#Installing Joomlavs
+		install_message Joomlavs &> /dev/null
+		#Remove Corrupted Joomlavs
+		rm -f -r $application_path$joomlavs_folder
+		install_git $joomlavs_git $joomlavs_folder
+		# CD to apps dir
+		xterm -e "cd $application_path$joomlavs_folder; gem install bundler; bundle install; chmod +x joomlavs.rb;cd $default_directory" &
+		wait
+		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"
+		;;
+	"./$application_path$liferayscan_folder/LiferayScan")
+		#Installing LiferayScan
+		install_message LiferayScan &> /dev/null
+		#Remove Corrupted Files
+		rm -f -r $application_path$liferayscan_folder 
+		install_git $liferayscan_git $liferayscan_folder_main 
+		xterm -e "cd $application_path$liferayscan_folder_main; bundle install; gem build LiferayScan.gemspec; gem install --local LiferayScan-0.0.1.gem; cd $default_directory" &
+		wait
+		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"
+		;;
+	"./$application_path$droopescan_folder/droopescan")
+		#Installing Droopescan
+		install_message Droopescan &> /dev/null
+		#Remove Corrupted Files
+		rm -f -r $application_path$droopescan_folder
+		install_git $droopescan_git $droopescan_folder 
+		xterm -e "cd $application_path$droopescan_folder; pip install -r requirements.txt; cd $default_directory" &
+		wait
 		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"
 		;;
 	*)
@@ -539,6 +589,79 @@ function nessus_module {
 	}
 
 
+function wpscan_module {
+	
+	echo -e "What is your host?  \c"
+	read hosts
+	
+	echo -e "$OKGREEN
+
+	Scan Wordpress using:
+	
+	1 : Non Intrusive Scane
+	2 : Enumerate User
+	3 : Enumerate Plugins
+	4 : Enumerate Themes
+	
+	99: Exit
+	$RESET"
+	
+	echo -e "Your choice is? \c"
+	read  choice
+	
+	case "$choice" in
+	"1")
+		xterm -hold -e "wpscan --url $hosts" &
+		CMS_Interface
+		;;
+	"2")
+		xterm -hold -e "wpscan --url $hosts --enumerate u" &
+		CMS_Interface
+		;;
+	"3")
+		xterm -hold -e "wpscan --url $hosts --enumerate p" &
+		CMS_Interface
+		;;
+	"4")
+		xterm -hold -e "wpscan --url $hosts --enumerate t" &
+		CMS_Interface
+		;;
+	"1")
+		xterm -hold -e "wpscan --url $hosts" &
+		CMS_Interface
+		;;
+	*)
+		echo "Bye Bye~"
+		exit
+		;;
+	esac
+	
+	}
+	
+	
+function joomlavs_module {
+	echo -e "What is your host? e.g www.example.com  \c"
+	read hosts	
+	xterm -hold -e "./$application_path$joomlavs_folder/joomlavs.rb -u $hosts --scan-all" &
+	CMS_Interface
+	}
+	
+	
+function droopescan_module {
+	echo -e "What is your host? e.g www.example.com  \c"
+	read hosts
+	xterm -hold -e "./$application_path$droopescan_folder/droopescan scan drupal -u $hosts -t 8" &
+	CMS_Interface
+	}
+	
+	
+function liferayscan_module {
+	echo -e "What is your host? e.g www.example.com  \c"
+	read hosts
+	xterm -hold -e "./$application_path$liferayscan_folder/LiferayScan -u $hosts" &
+	CMS_Interface
+	}
+
 #    ______            _       _ _     __  __           _       _      
 #   |  ____|          | |     (_) |   |  \/  |         | |     | |     
 #   | |__  __  ___ __ | | ___  _| |_  | \  / | ___   __| |_   _| | ___ 
@@ -694,6 +817,7 @@ Select from the 'Reconnaisance' menu:
 
 #Nmap Interface	
 function nmap_interface {
+	echo $thisDirPath
 	main_logo
 	echo -e "$OKGREEN
 [+]       Coded BY Muzaffar Mohamed       [+] 
@@ -763,7 +887,7 @@ Select from the 'Vulnerability Scanning' menu:
 	2 : Openvas - $OKORANGE Vulnerability Scanning and Management Solution $RESET $OKGREEN
 	3 : Nessus - $OKORANGE Vulnerability Scanning Tool $RESET $OKGREEN
 	4 : Burpsuit - $OKORANGE  Toolkit for Web Application Security Testing $RESET $OKGREEN
-	5 : CMS VulnerabilityScanner - $OKORANGE  TODO $RESET $OKGREEN
+	5 : CMS Vulnerability Scanner - $OKORANGE Wordpress,Joomla,Drupal,Liferay  $RESET $OKGREEN
 	
 	99 : Return		
 	$RESET"
@@ -783,6 +907,52 @@ Select from the 'Vulnerability Scanning' menu:
 		;;
 	"4")
 		burpsuite_module
+		;;
+	"5")
+		CMS_Interface
+		;;
+	*)
+		#echo "Huhhh! Wrong input!"
+		init
+		;;
+	esac
+}
+
+
+#CMS Scanner Interface
+function CMS_Interface {
+	main_logo
+	echo -e "$OKGREEN
+[+]       Coded BY Muzaffar Mohamed       [+] 
+[-]           coco.oligococo.tk           [-]
+[-]       	    Local IP:         	  [-]$RESET $OKORANGE
+[-]             $ip_local      	  [-]$RESET $OKGREEN  
+
+Select from the 'Vulnerability Scanning' menu:
+	
+	1 : WPScan  - $OKORANGE  WordPress vulnerability scanner $RESET $OKGREEN
+	2 : Joomlavs - $OKORANGE Joomla vulnerability scanner $RESET $OKGREEN
+	3 : Droopescan - $OKORANGE Drupal & Silver Stripe vulnerability scanner $RESET $OKGREEN
+	4 : LiferayScan - $OKORANGE  Liferay vulnerability scanner $RESET $OKGREEN
+	
+	99 : Return		
+	$RESET"
+	
+	echo -e "Holla! Your choice is? \c"
+	read  choice
+	
+	case "$choice" in
+	"1")
+		wpscan_module
+		;;
+	"2")
+		joomlavs_module
+		;;
+	"3")
+		droopescan_module
+		;;
+	"4")
+		liferayscan_module
 		;;
 	*)
 		#echo "Huhhh! Wrong input!"
