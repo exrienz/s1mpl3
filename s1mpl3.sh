@@ -61,7 +61,6 @@ declare -r nessus_git='http://www.coco.oligococo.tk/file/Nessus-6.10.5-debian6_a
 declare -a required_apps=("nmap" 
 						"nikto" 
 						"sniper" 
-						"fatrat" 
 						"./$application_path$metagoofil_folder/metagoofil.py" 
 						"./$application_path$wig_folder/wig.py"
 						"./$application_path$arachni_folder/arachni_web"
