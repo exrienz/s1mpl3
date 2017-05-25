@@ -20,6 +20,8 @@ default_directory=`pwd`
 
 declare -r ip_local=$(ip -4 route get 8.8.8.8 | awk {'print $7'} | tr -d '\n')
 
+declare -r app_version='V 5.0 (x64)'
+
 declare -r application_path='Application/'
 declare -r report_path='Report/'
 declare -r bin_path='/usr/local/bin'
@@ -649,7 +651,7 @@ function main_logo {
 	echo -e "$OKRED███████╗╚██║██╔████╔██║██████╔╝██║      █████╔╝  $RESET"
 	echo -e "$OKRED╚════██║ ██║██║╚██╔╝██║██╔═══╝ ██║      ╚═══██╗  $RESET"
 	echo -e "$OKRED███████║ ██║██║ ╚═╝ ██║██║     ███████╗██████╔╝  $RESET"
-	echo -e "$OKRED╚══════╝ ╚═╝╚═╝     ╚═╝╚═╝     ╚══════╝╚═════╝x64B1T	$RESET"
+	echo -e "$OKRED╚══════╝ ╚═╝╚═╝     ╚═╝╚═╝     ╚══════╝╚═════╝ $app_version$RESET"
 	}
 
 
@@ -765,7 +767,6 @@ Select from the 'Reconnaisance' menu:
 
 #Nmap Interface	
 function nmap_interface {
-	echo $thisDirPath
 	main_logo
 	echo -e "$OKGREEN
 [+]       Coded BY Muzaffar Mohamed       [+] 
