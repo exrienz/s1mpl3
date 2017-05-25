@@ -65,7 +65,6 @@ declare -a required_apps=("nmap"
 						"./$application_path$metagoofil_folder/metagoofil.py" 
 						"./$application_path$wig_folder/wig.py"
 						"./$application_path$arachni_folder/arachni_web"
-						#"openvas-start"
 						"/etc/init.d/nessusd"
 						"./$application_path$joomlavs_folder/joomlavs.rb"
 						"./$application_path$liferayscan_folder/LiferayScan"
@@ -894,6 +893,7 @@ Select from the 'Vulnerability Scanning' menu:
 			*)
 				va_scanning
 				;;
+			esac
 		fi
 		;;
 	"3")
