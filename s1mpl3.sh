@@ -20,7 +20,7 @@ default_directory=`pwd`
 
 declare -r ip_local=$(ip -4 route get 8.8.8.8 | awk {'print $7'} | tr -d '\n')
 
-declare -r app_version='V 5.3'
+declare -r app_version='V 5.5'
 
 declare -r application_path='Application/'
 declare -r report_path='Report/'
@@ -240,6 +240,56 @@ function install_apps {
 		wait
 		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"
 		;;
+	"openvas-start")
+		echo -e "OpenVas module is not available, install now? (It might take a looong time!) y/n \c"
+		read actions
+		case "$actions" in
+		"y")
+			#Download and install OpenVas
+			install_message openvas &> /dev/null
+			#xterm -e "apt-get update -y" &
+			#wait
+			#xterm -e "apt-get upgrade -y" &
+			#wait
+			gnome-terminal -x "apt-get install openvas" &
+			wait
+			gnome-terminal -x "openvas-setup" &
+			wait
+			echo -e "$OKGREEN	[✔-OK!]::[Apps]: OpenVas $RESET"
+			va_scanning
+			;;
+		*)
+			va_scanning
+			;;
+		esac
+		;;
+	"fatrat")
+		echo -e "Fatrat module is not available, install now? (It might take a looong time!) y/n \c"
+		read actions
+		case "$actions" in
+		"y")
+			#Download and install fatrat
+			install_message Fatrat
+			if [ -d "$application_path$fatrat" ]; then
+			  # if true this block of code will execute
+				xterm -e "./$application_path$fatrat_folder/setup.sh" &
+				wait
+			else
+				install_git $fatrat_git $fatrat_folder
+				chmod +x $application_path$fatrat_folder/powerfull.sh
+				chmod +x $application_path$fatrat_folder/setup.sh
+				gnome-terminal -x "./$application_path$fatrat_folder/setup.sh" &
+				wait
+			fi
+			#rm -r $application_path$fatrat_folder
+			echo -e "$OKGREEN	[✔-OK!]::[Apps]: Fatrat $RESET"	
+			exploit_interface
+			;;
+		*)
+			exploit_interface
+			;;
+		esac
+		;;
 	*)
 		echo ""
 		echo -e "$OKGREEN Enjoy! $RESET"
@@ -278,7 +328,7 @@ runSelfUpdate() {
 if mv "$0.tmp" "$0"; then
   echo "Done. Update complete."
   rm \$0
-  ./s1mpl3.sh
+  ./$SELF.sh
 else
   echo "Failed!"
 fi
@@ -288,6 +338,7 @@ EOF
 	exec /bin/bash updateScript.sh
 	}
 
+	
 #    _____                        __  __           _       _      
 #   |  __ \                      |  \/  |         | |     | |     
 #   | |__) |___  ___ ___  _ __   | \  / | ___   __| |_   _| | ___ 
@@ -384,6 +435,12 @@ function sniper_module {
 	echo -e "What is your host? e.g. www.example.com  \c"
 	read hosts
 	mkdir -p $report_path$hosts/sn1per_output 2> /dev/null
+	mkdir -p /usr/share/sniper/loot
+	mkdir -p /usr/share/sniper/loot/domains
+	mkdir -p /usr/share/sniper/loot/nmap
+	mkdir -p /usr/share/sniper/loot/output
+	mkdir -p /usr/share/sniper/loot/reports
+	mkdir -p /usr/share/sniper/loot/screenshots
 	xterm -e "sniper $hosts" &
 	wait
 	cp -r -f -v /usr/share/sniper/loot/ $report_path$hosts/sn1per_output
@@ -411,7 +468,7 @@ function brute_dir_module {
 	#wfuzz -c -z file,/usr/share/wordlists/fasttrack.txt --hc 404,301 -o html http://example.com/FUZZ > output.html
 	echo -e $OKRED
 	echo -e "Bruteforcing....Please wait...... "$RESET
-	wfuzz -c -z file,$use_word_list --hc 404,301,302 -o html $protocols://$hosts/FUZZ &>> $report_path$hosts/$output.html
+	xterm -e "wfuzz -c -z file,$use_word_list --hc 404,301,302 -o html $protocols://$hosts/FUZZ &>> $report_path$hosts/$output.html"
 	x-www-browser $report_path$hosts/$output.html 2> /dev/null &
 	recon
 	}
@@ -423,6 +480,7 @@ function nikto_module {
 	echo -e "What is your host? e.g. www.example.com  \c"
 	read hosts
 	output="Nikto_Report"
+	rm -f $output.html
 	nikto -h $protocols://$hosts -F htm -output $output.html
 	mv $output.html $report_path$hosts/$output.html
 	x-www-browser $report_path$hosts/$output.html 2> /dev/null &
@@ -460,7 +518,8 @@ function reconng_module {
 	
 	
 function maltego_module {
-	xterm -hold -e 'maltegoce' &
+	xterm -e 'maltegoce' &
+	wait
 	recon
 	}
 	
@@ -628,6 +687,7 @@ function liferayscan_module {
 	CMS_Interface
 	}
 
+	
 #    ______            _       _ _     __  __           _       _      
 #   |  ____|          | |     (_) |   |  \/  |         | |     | |     
 #   | |__  __  ___ __ | | ___  _| |_  | \  / | ___   __| |_   _| | ___ 
@@ -848,6 +908,7 @@ Select from the 'Vulnerability Scanning' menu:
 	3 : Nessus - $OKORANGE Vulnerability Scanning Tool $RESET $OKGREEN
 	4 : Burpsuit - $OKORANGE  Toolkit for Web Application Security Testing $RESET $OKGREEN
 	5 : CMS Vulnerability Scanner - $OKORANGE Wordpress,Joomla,Drupal,Liferay  $RESET $OKGREEN
+	5 : OWASP Top 10 Vulnerability Scanner - $OKORANGE SQLi,XXS,LFI,RFI etc  $RESET $OKGREEN
 	
 	99 : Return		
 	$RESET"
@@ -865,27 +926,7 @@ Select from the 'Vulnerability Scanning' menu:
 			#Execute OpenVas
 			open_vas_module
 		else
-			echo -e "OpenVas module is not available, install now? y/n \c"
-			read actions
-			case "$actions" in
-			"y")
-				#Download and install OpenVas
-				install_message openvas &> /dev/null
-				#xterm -e "apt-get update -y" &
-				#wait
-				#xterm -e "apt-get upgrade -y" &
-				#wait
-				xterm -e "apt-get install openvas" &
-				wait
-				xterm -e "openvas-setup" &
-				wait
-				echo -e "$OKGREEN	[✔-OK!]::[Apps]: OpenVas $RESET"
-				va_scanning
-				;;
-			*)
-				va_scanning
-				;;
-			esac
+			install_apps openvas-start
 		fi
 		;;
 	"3")
@@ -896,6 +937,9 @@ Select from the 'Vulnerability Scanning' menu:
 		;;
 	"5")
 		CMS_Interface
+		;;
+	"6")
+		OWASP_Interface
 		;;
 	*)
 		#echo "Huhhh! Wrong input!"
@@ -948,6 +992,52 @@ Select from the 'Vulnerability Scanning' menu:
 }
 
 
+#Owasp Interface	
+function OWASP_Interface {
+	main_logo
+	echo -e "$OKGREEN
+[+]       Coded BY Muzaffar Mohamed       [+] 
+[-]           coco.oligococo.tk           [-]
+[-]       	    Local IP:         	  [-]$RESET $OKORANGE
+[-]             $ip_local      	  [-]$RESET $OKGREEN  
+
+Select from the 'Nmap command' menu:
+	
+	1 : Shuriken - $OKORANGE  Automated XSS Scanner $RESET $OKGREEN
+	2 : SQLMap - $OKORANGE Automated SQLi Scanner $RESET $OKGREEN
+	3 : Kadimus - $OKORANGE  LFI Scanner $RESET $OKGREEN
+	4 : All-in-one SSL Vulnerability Scan
+	5 : All-in-one Common Web Vulnerability Scan
+	6 : Basic SMB Scanner (TODO: Doublepulsar)
+	7 : Update NSE Script
+	
+	99: Return	
+	$RESET"
+	
+	echo -e "Hey! Your choice is? \c"
+	read  choice
+	
+	case "$choice" in
+	"1")
+		nmap_module
+		;;
+	"2")
+		nmap_udp_module
+		;;
+	"3")
+		nmap_aio_enum_module
+		;;
+	"4")
+		nmap_aio_ssl_module
+		;;
+	*)
+		#echo "Huhhh! Wrong input!"
+		recon
+		;;
+	esac
+}
+
+
 #Exploit Interface
 function exploit_interface {
 	main_logo
@@ -974,31 +1064,7 @@ Select from the 'Vulnerability Scanning' menu:
 			#Execute OpenVas
 			fatrat_module
 		else
-			echo -e "Fatrat module is not available, install now? y/n \c"
-			read actions
-			case "$actions" in
-			"y")
-				#Download and install fatrat
-				install_message Fatrat
-				if [ -d "$application_path$fatrat" ]; then
-				  # if true this block of code will execute
-					xterm -e "./$application_path$fatrat_folder/setup.sh" &
-					wait
-				else
-					install_git $fatrat_git $fatrat_folder
-					chmod +x $application_path$fatrat_folder/powerfull.sh
-					chmod +x $application_path$fatrat_folder/setup.sh
-					xterm -e "./$application_path$fatrat_folder/setup.sh" &
-					wait
-				fi
-				#rm -r $application_path$fatrat_folder
-				echo -e "$OKGREEN	[✔-OK!]::[Apps]: Fatrat $RESET"	
-				exploit_interface
-				;;
-			*)
-				exploit_interface
-				;;
-			esac
+			install_apps fatrat
 		fi
 		;;
 	*)
