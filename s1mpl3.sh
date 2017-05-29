@@ -468,7 +468,7 @@ function brute_dir_module {
 	#wfuzz -c -z file,/usr/share/wordlists/fasttrack.txt --hc 404,301 -o html http://example.com/FUZZ > output.html
 	echo -e $OKRED
 	echo -e "Bruteforcing....Please wait...... "$RESET
-	xterm -e "wfuzz -c -z file,$use_word_list --hc 404,301,302 -o html $protocols://$hosts/FUZZ &>> $report_path$hosts/$output.html"
+	xterm -e "wfuzz -c -z file,$use_word_list --hc 404,301,302 -o html $protocols://$hosts/FUZZ 2>> $report_path$hosts/$output.html"
 	x-www-browser $report_path$hosts/$output.html 2> /dev/null &
 	recon
 	}
