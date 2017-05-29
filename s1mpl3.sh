@@ -20,7 +20,7 @@ default_directory=`pwd`
 
 declare -r ip_local=$(ip -4 route get 8.8.8.8 | awk {'print $7'} | tr -d '\n')
 
-declare -r app_version='V 5.7'
+declare -r app_version='V 5.8'
 
 declare -r application_path='Application/'
 declare -r report_path='Report/'
@@ -328,7 +328,7 @@ runSelfUpdate() {
 if mv "$0.tmp" "$0"; then
   echo "Done. Update complete."
   rm \$0
-  ./$SELF.sh
+  ./$SELF
 else
   echo "Failed!"
 fi
