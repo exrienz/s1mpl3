@@ -20,7 +20,7 @@ default_directory=`pwd`
 
 declare -r ip_local=$(ip -4 route get 8.8.8.8 | awk {'print $7'} | tr -d '\n')
 
-declare -r app_version='V 5.6'
+declare -r app_version='V 5.7'
 
 declare -r application_path='Application/'
 declare -r report_path='Report/'
@@ -468,7 +468,7 @@ function brute_dir_module {
 	#wfuzz -c -z file,/usr/share/wordlists/fasttrack.txt --hc 404,301 -o html http://example.com/FUZZ > output.html
 	echo -e $OKRED
 	echo -e "Bruteforcing....Please wait...... "$RESET
-	xterm -e "wfuzz -c -z file,$use_word_list --hc 404,301,302 -o html $protocols://$hosts/FUZZ 2>> $report_path$hosts/$output.html"
+	xterm -e "wfuzz -c -z file,$use_word_list --hc 404,301,302 -o html $protocols://$hosts/FUZZ | tee -a $report_path$hosts/$output.html"
 	x-www-browser $report_path$hosts/$output.html 2> /dev/null &
 	recon
 	}
@@ -497,7 +497,7 @@ function wig_module {
 	mkdir -p $report_path$hosts 2> /dev/null
 	#./Application/wig/wig.py http://localhost:9292  &>> Report/localhost/CMS_Identifier_Report.txt
 	echo  -e $OKRED & echo -e "Scanning...This process might take same time, please wait..$RESET" & echo
-	./Application/wig/wig.py $protocols://$hosts  &>> $report_path$hosts/$output.txt
+	./Application/wig/wig.py $protocols://$hosts  | tee -a $report_path$hosts/$output.txt
 	xdg-open $report_path$hosts/$output.txt 2> /dev/null &
 	recon
 	}	
@@ -543,7 +543,7 @@ function http_method_module {
 			# display $line or do somthing with $line
 			# echo "$line"
 			echo "URL : $line" >> $report_path$hosts/$output.txt
-			curl -i -X OPTIONS $line >>$report_path$hosts/$output.txt
+			curl -i -X OPTIONS $line >> $report_path$hosts/$output.txt
 			echo >> $report_path$hosts/$output.txt
 			echo
 			echo 
