@@ -20,7 +20,7 @@ default_directory=`pwd`
 
 declare -r ip_local=$(ip -4 route get 8.8.8.8 | awk {'print $7'} | tr -d '\n')
 
-declare -r app_version='V 5.8'
+declare -r app_version='V 5.9'
 
 declare -r application_path='Application/'
 declare -r report_path='Report/'
@@ -434,23 +434,11 @@ function metagofil_module {
 function sniper_module {
 	echo -e "What is your host? e.g. www.example.com  \c"
 	read hosts
-	mkdir -p $report_path$hosts/sn1per_output 2> /dev/null
-	mkdir -p /usr/share/sniper/loot
-	mkdir -p /usr/share/sniper/loot/domains
-	mkdir -p /usr/share/sniper/loot/nmap
-	mkdir -p /usr/share/sniper/loot/output
-	mkdir -p /usr/share/sniper/loot/reports
-	mkdir -p /usr/share/sniper/loot/screenshots
-	xterm -e "sniper $hosts" &
+	xterm -e "sniper $hosts web report" &
 	wait
-	cp -r -f -v /usr/share/sniper/loot/ $report_path$hosts/sn1per_output
-	rm -r /usr/share/sniper/loot/
-	mkdir -p /usr/share/sniper/loot
-	mkdir -p /usr/share/sniper/loot/domains
-	mkdir -p /usr/share/sniper/loot/nmap
-	mkdir -p /usr/share/sniper/loot/output
-	mkdir -p /usr/share/sniper/loot/reports
-	mkdir -p /usr/share/sniper/loot/screenshots
+	xterm -e "sniper loot <<< $hosts" &
+	wait
+	echo "Done!"
 	recon
 	}
 	
