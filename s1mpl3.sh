@@ -20,7 +20,7 @@ default_directory=`pwd`
 
 declare -r ip_local=$(ip -4 route get 8.8.8.8 | awk {'print $7'} | tr -d '\n')
 
-declare -r app_version='V 6.1'
+declare -r app_version='V 6.2'
 
 declare -r application_path='Application/'
 declare -r report_path='Report/'
@@ -439,14 +439,16 @@ function sniper_module {
 	read  choice
 	
 	
-	if [ $count -eq "y" ]
+	if [ $choice != "y" ]
 	then
-	  MODE = "stealth"
+	  #If not yes, use web scan
+	  scan_mode="web"
 	else
-	  MODE = "web"
+	  #Use stealth scan
+	  scan_mode="stealth"
 	fi
 	
-	xterm -e "sniper $hosts $MODE report" &
+	xterm -e "sniper $hosts $scan_mode report <<< $hosts" &
 	wait
 	xterm -e "sniper loot <<< $hosts" &
 	wait
