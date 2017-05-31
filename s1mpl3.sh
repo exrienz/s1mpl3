@@ -20,7 +20,7 @@ default_directory=`pwd`
 
 declare -r ip_local=$(ip -4 route get 8.8.8.8 | awk {'print $7'} | tr -d '\n')
 
-declare -r app_version='V 5.9'
+declare -r app_version='V 6.0'
 
 declare -r application_path='Application/'
 declare -r report_path='Report/'
@@ -434,7 +434,21 @@ function metagofil_module {
 function sniper_module {
 	echo -e "What is your host? e.g. www.example.com  \c"
 	read hosts
-	xterm -e "sniper $hosts web report" &
+	
+	echo -e "Do a passive (Stealth) scan? (y/n) \c"
+	read  choice
+	
+	case "$choice" in
+	"y")
+		MODE = "stealth"
+		;;
+	*)
+		MODE = "web"
+		exit
+		;;
+	esac
+	
+	xterm -e "sniper $hosts $MODE report" &
 	wait
 	xterm -e "sniper loot <<< $hosts" &
 	wait
