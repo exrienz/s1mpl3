@@ -20,7 +20,7 @@ default_directory=`pwd`
 
 declare -r ip_local=$(ip -4 route get 8.8.8.8 | awk {'print $7'} | tr -d '\n')
 
-declare -r app_version='V 6.4'
+declare -r app_version='V 6.5'
 
 declare -r application_path='Application/'
 declare -r report_path='Report/'
