@@ -20,7 +20,7 @@ default_directory=`pwd`
 
 declare -r ip_local=$(ip -4 route get 8.8.8.8 | awk {'print $7'} | tr -d '\n')
 
-declare -r app_version='V 6.2'
+declare -r app_version='V 6.4'
 
 declare -r application_path='Application/'
 declare -r report_path='Report/'
@@ -435,24 +435,27 @@ function sniper_module {
 	echo -e "What is your host? e.g. www.example.com  \c"
 	read hosts
 	
-	echo -e "Do a passive (Stealth) scan? (y/n) \c"
-	read  choice
+	echo -e "On Port? e.g. 80  \c"
+	read ports
+	#echo -e "Do a passive (Stealth) scan? (y/n) \c"
+	#read  choice
 	
-	
-	if [ $choice != "y" ]
-	then
+	#if [ $choice != "y" ]
+	#then
 	  #If not yes, use web scan
-	  scan_mode="web"
-	else
+	  #scan_mode="web"
+	#else
 	  #Use stealth scan
-	  scan_mode="stealth"
-	fi
+	  #scan_mode="stealth"
+	#fi
 	
-	xterm -e "sniper $hosts $scan_mode report <<< $hosts" &
-	wait
-	xterm -e "sniper loot <<< $hosts" &
-	wait
-	echo "Done!"
+	mkdir -p $report_path$hosts 2> /dev/null
+	output="Sniper_Output"
+	xterm -e "sniper $hosts port $ports |& tee -a $report_path$hosts/$output.txt xdg-open && $report_path$hosts/$output.txt 2> /dev/null" &
+	#wait
+	#xterm -e "sniper $hosts $scan_mode report <<< $hosts" &
+	#wait
+	#xterm -e "sniper loot <<< $hosts" &
 	recon
 	}
 	
@@ -468,10 +471,8 @@ function brute_dir_module {
 	output="Web_Directory_Bruteforce_Report"
 	mkdir -p $report_path$hosts 2> /dev/null
 	#wfuzz -c -z file,/usr/share/wordlists/fasttrack.txt --hc 404,301 -o html http://example.com/FUZZ > output.html
-	echo -e $OKRED
-	echo -e "Bruteforcing....Please wait...... "$RESET
-	xterm -e "wfuzz -c -z file,$use_word_list --hc 404,301,302 -o html $protocols://$hosts/FUZZ | tee -a $report_path$hosts/$output.html"
-	x-www-browser $report_path$hosts/$output.html 2> /dev/null &
+	#xterm -e "wfuzz -c -z file,$use_word_list --hc 404 -o html $protocols://$hosts/FUZZ |& tee $report_path$hosts/$output.html ; x-www-browser $report_path$hosts/$output.html 2> /dev/null" &
+	xterm -e "dirb $protocols://$hosts/ $use_word_list  -o $report_path$hosts/$output.txt && $report_path$hosts/$output.txt 2> /dev/null" &
 	recon
 	}
 	
@@ -499,7 +500,7 @@ function wig_module {
 	mkdir -p $report_path$hosts 2> /dev/null
 	#./Application/wig/wig.py http://localhost:9292  &>> Report/localhost/CMS_Identifier_Report.txt
 	echo  -e $OKRED & echo -e "Scanning...This process might take same time, please wait..$RESET" & echo
-	./Application/wig/wig.py $protocols://$hosts  | tee -a $report_path$hosts/$output.txt
+	./Application/wig/wig.py $protocols://$hosts  |& tee $report_path$hosts/$output.txt
 	xdg-open $report_path$hosts/$output.txt 2> /dev/null &
 	recon
 	}	
@@ -787,7 +788,7 @@ Select from the 'Reconnaisance' menu:
 	3  : Nikto - $OKORANGE Server Configuration Scanner $RESET $OKGREEN
 	4  : Wig - $OKORANGE CMS Identifier $RESET $OKGREEN
 	5  : Burpsuite_module - $OKORANGE Active/Passive Website Crawler $RESET $OKGREEN
-	6  : WFuzz - $OKORANGE Hidden Web Directory Bruteforcer $RESET $OKGREEN
+	6  : Dirb - $OKORANGE Hidden Web Directory Bruteforcer $RESET $OKGREEN
 	7  : Metagoofil - $OKORANGE Information gathering tool $RESET $OKGREEN
 	8  : HTTP Method Analyzer - $OKORANGE Http Method Analyzer $RESET $OKGREEN
 	9  : Maltego - $OKORANGE Reconnaissance framework $RESET $OKGREEN
