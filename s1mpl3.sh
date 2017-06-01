@@ -353,7 +353,7 @@ function nmap_module {
 	read hosts
 	mkdir -p $report_path$hosts 2> /dev/null
 	output="Nmap_Intense_Scan_Report"
-	nmap -p- -A -sV --version-intensity 5 --script=whois-ip,banner $hosts -oX $report_path$hosts/$output.xml 2> /dev/null
+	nmap -p- -A -sV -sC --version-intensity 5 --script=whois-ip,banner,iscsi-brute,isns-info,ntp-info $hosts -oX $report_path$hosts/$output.xml 2> /dev/null
 	xml2html $hosts $output
 	nmap_interface
 	}
@@ -377,7 +377,7 @@ function nmap_aio_enum_module {
 	read portz
 	mkdir -p $report_path$hosts 2> /dev/null
 	output="Nmap_Http_Enum_Scan_Report"
-	nmap -p $portz -sV -sC --script=http-title,http-traceroute,http-waf-detect,http-waf-fingerprint,http-internal-ip-disclosure,http-server-header,whois-ip,http-exif-spider,http-headers,http-referer-checker,http-enum,http-open-redirect,http-phpself-xss,http-xssed,http-userdir-enum,http-sitemap-generator,http-svn-info,http-unsafe-output-escaping,http-default-accounts,http-aspnet-debug,http-php-version,http-cross-domain-policy,http-comments-displayer,http-backup-finder,http-auth-finder,http-apache-server-status,http-ls,http-mcmp,http-mobileversion-checker,http-robtex-shared-ns,firewalk --traceroute $hosts -oX $report_path$hosts/$output.xml 2> /dev/null
+	nmap -p $portz -sV -sC --script=http-title,http-method-tamper,http-traceroute,http-waf-detect,http-waf-fingerprint,http-internal-ip-disclosure,http-server-header,whois-ip,http-exif-spider,http-headers,http-referer-checker,http-enum,http-open-redirect,http-phpself-xss,http-xssed,http-userdir-enum,http-sitemap-generator,http-svn-info,http-unsafe-output-escaping,http-default-accounts,http-aspnet-debug,http-php-version,http-cross-domain-policy,http-comments-displayer,http-backup-finder,http-auth-finder,http-apache-server-status,http-ls,http-mcmp,http-mobileversion-checker,http-robtex-shared-ns,http-rfi-spider,http-vhosts,firewalk --traceroute $hosts -oX $report_path$hosts/$output.xml 2> /dev/null
 	xml2html $hosts $output
 	nmap_interface
 	}
@@ -416,7 +416,33 @@ function nmap_smb_module {
 	xml2html $hosts $output
 	nmap_interface
 	}
+
 	
+function nmap_ftp_module {
+	echo -e "What is your host? e.g. www.example.com  \c"
+	read hosts
+	echo -e "What is your ftp port? (e.g. 21) \c"
+	read port
+	mkdir -p $report_path$hosts 2> /dev/null
+	output="Nmap_ftp_Scan_Report"
+	nmap -p $port -sV -sC --script=ftp-libopie,ftp-proftpd-backdoor,ftp-vsftpd-backdoor,ftp-vuln-cve2010-4221 $hosts -oX $report_path$hosts/$output.xml 2> /dev/null
+	xml2html $hosts $output
+	nmap_interface
+	}
+
+	
+function nmap_email_enumerator_module {
+	echo -e "What is your host? e.g. www.example.com  \c"
+	read hosts
+	echo -e "What is your web port? (e.g. 80) \c"
+	read port
+	mkdir -p $report_path$hosts 2> /dev/null
+	output="Nmap_email_enumerator_Report"
+	nmap -p $port $hosts --script http-grep --script-args='match="[A-Za-z0-9%.%%%+%-]+@[A-Za-z0-9%.%%%+%-]+%.%w%w%w?%w?",breakonmatch' -oX $report_path$hosts/$output.xml 2> /dev/null
+	xml2html $hosts $output
+	nmap_interface
+	}
+
 	
 function metagofil_module {
 	echo -e "What is your host? e.g. www.example.com  \c"
@@ -791,8 +817,9 @@ Select from the 'Reconnaisance' menu:
 	6  : Dirb - $OKORANGE Hidden Web Directory Bruteforcer $RESET $OKGREEN
 	7  : Metagoofil - $OKORANGE Information gathering tool $RESET $OKGREEN
 	8  : HTTP Method Analyzer - $OKORANGE Http Method Analyzer $RESET $OKGREEN
-	9  : Maltego - $OKORANGE Reconnaissance framework $RESET $OKGREEN
-	10 : Recon-Ng - $OKORANGE Web Reconnaissance framework $RESET $OKGREEN
+	9  : HTTP Method Analyzer - $OKORANGE Http Method Analyzer $RESET $OKGREEN
+	12  : Maltego - $OKORANGE Reconnaissance framework $RESET $OKGREEN
+	13 : Recon-Ng - $OKORANGE Web Reconnaissance framework $RESET $OKGREEN
 	
 	99 : Return		
 	$RESET"
@@ -826,9 +853,12 @@ Select from the 'Reconnaisance' menu:
 		http_method_module
 		;;
 	"9")
+		http_method_module
+		;;
+	"12")
 		maltego_module
 		;;
-	"10")
+	"13")
 		reconng_module
 		;;
 	*)
@@ -855,8 +885,9 @@ Select from the 'Nmap command' menu:
 	3 : All-in-one Web Enumeration
 	4 : All-in-one SSL Vulnerability Scan
 	5 : All-in-one Common Web Vulnerability Scan
-	6 : Basic SMB Scanner (TODO: Doublepulsar)
-	7 : Update NSE Script
+	6 : NMAP Email Enumerator
+	7 : Basic SMB Scanner (Port 445)
+	8 : Basic FTP Scanner (Port 21)
 	
 	99: Return	
 	$RESET"
@@ -881,9 +912,15 @@ Select from the 'Nmap command' menu:
 		nmap_aio_cve_module
 		;;
 	"6")
-		nmap_smb_module
+		nmap_email_enumerator_module
 		;;
 	"7")
+		nmap_smb_module
+		;;
+	"8")
+		nmap_ftp_module
+		;;
+	"20")
 		nmap --script-updatedb
 		nmap_interface
 		;;
