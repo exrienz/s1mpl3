@@ -20,7 +20,7 @@ default_directory=`pwd`
 
 declare -r ip_local=$(ip -4 route get 8.8.8.8 | awk {'print $7'} | tr -d '\n')
 
-declare -r app_version='V 6.5'
+declare -r app_version='V 6.8'
 
 declare -r application_path='Application/'
 declare -r report_path='Report/'
@@ -57,6 +57,8 @@ declare -r liferayscan_git='https://github.com/bcoles/LiferayScan.git'
 declare -r liferayscan_folder='LiferayScan/bin'
 declare -r liferayscan_folder_main='LiferayScan'
 
+declare -r cupp_git='https://github.com/Mebus/cupp.git'
+declare -r cupp_folder='cupp'
 
 declare -r nessus_git='http://www.coco.oligococo.tk/file/Nessus-6.10.5-debian6_amd64.deb'
 
@@ -78,6 +80,7 @@ declare -a wordlist_path=("/usr/share/wordlists/wfuzz/general/common.txt"
 						"/usr/share/wordlists/wfuzz/general/big.txt"
 						"/usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt"
 						"/usr/share/wordlists/fasttrack.txt")
+
 
 OKBLUE='\033[94m'
 OKRED='\033[91m'
@@ -287,6 +290,39 @@ function install_apps {
 			;;
 		*)
 			exploit_interface
+			;;
+		esac
+		;;
+	"mantra")
+		echo -e "Mantra module is not available, install now? (It might take some time!) y/n \c"
+		read actions
+		case "$actions" in
+		"y")
+			#Download and install fatrat
+			install_message Mantra
+			xterm -e "apt-get install owasp-mantra-ff" &
+			wait
+			echo -e "$OKGREEN	[✔-OK!]::[Apps]: Owasp Mantra $RESET"	
+			tool_interface
+			;;
+		*)
+			tool_interface
+			;;
+		esac
+		;;
+	"cupp")
+		echo -e "Cupp module is not available, install now? (It might take some time!) y/n \c"
+		read actions
+		case "$actions" in
+		"y")
+			#Download and install Cupp
+			install_message Cupp
+			install_git $cupp_git $cupp_folder
+			echo -e "$OKGREEN	[✔-OK!]::[Apps]: Owasp Mantra $RESET"
+			tool_interface
+			;;
+		*)
+			tool_interface
 			;;
 		esac
 		;;
@@ -587,6 +623,48 @@ function http_method_module {
 	}	
 
 
+function google_dork_module {
+	echo -e "$OKRED"
+	echo -e "This module open lots of tab. Is it ok? [y/n] \c"
+	read actions
+	echo -e "$RESET"
+	case "$actions" in
+	"y")
+		
+	echo -e "What is your host? e.g www.example.com  \c"
+	read hosts
+
+	declare -a dorks=(" -url https://www.google.com/search?q=site:$hosts+intitle:index.of"
+					" -url https://www.google.com/search?q=site:$hosts+ext:xml+|+ext:conf+|+ext:cnf+|+ext:reg+|+ext:inf+|+ext:rdp+|+ext:cfg+|+ext:txt+|+ext:ora+|+ext:ini+|+ext:sql+|+ext:dbf+|+ext:mdb+|+ext:log+|+ext:bkf+|+ext:bkp+|+ext:bak+|+ext:old+|+ext:backup"
+					" -url https://www.google.com/search?q=site:$hosts+inurl:login"
+					" -url https://www.google.com/search?q=site:$hosts+ext:doc+|+ext:docx+|+ext:odt+|+ext:pdf+|+ext:rtf+|+ext:sxw+|+ext:psw+|+ext:ppt+|+ext:pptx+|+ext:pps+|+ext:csv"
+					" -url https://www.google.com/search?q=site:$hosts+ext:action+OR+struts"
+					" -url https://www.google.com/search?q=site:$hosts+inurl:redir+OR+inurl:url+OR+inurl:redirect+OR+inurl:return+OR+inurl:src=http+OR+inurl:r=http"
+					" -url https://www.google.com/search?q=site:$hosts+inurl:wp-+OR+inurl:plugin+OR+inurl:upload+OR+inurl:download"
+					" -url https://www.google.com/search?q=site:$hosts+inurl:readme+OR+inurl:license+OR+inurl:install+OR+inurl:setup+OR+inurl:config"
+					" -url https://www.google.com/search?q=site:$hosts+inurl:shell+OR+inurl:backdoor+OR+inurl:wso+OR+inurl:cmd+OR+shadow+OR+passwd+OR+boot.ini+OR+inurl:backdoor"
+					" -url https://www.google.com/search?q=site:$hosts+username+OR+password+OR+login+OR+root+OR+admin"
+					" -url https://www.google.com/search?q=site:linkedin.com+employees+$hosts"
+					" -url https://www.google.com/search?q=site:$hosts+ext:php+intitle:phpinfo+%22published+by+the+PHP+Group%22"
+					" -url https://www.google.com/search?q=site:$hosts+intext:%22sql+syntax+near%22+|+intext:%22syntax+error+has+occurred%22+|+intext:%22incorrect+syntax+near%22+|+intext:%22unexpected+end+of+SQL+command%22+|+intext:%22Warning:+mysql_connect()%22+|+intext:%22Warning:+mysql_query()%22+|+intext:%22Warning:+pg_connect()%22"
+					" -url https://securityheaders.io/?q=$hosts"
+					" -url https://www.openbugbounty.org/search/?search=$hosts&type=host"
+					" -url https://crt.sh/?q=$hosts"
+					" -url https://www.tcpiputils.com/browse/domain/$hosts"
+					" -url http://toolbar.netcraft.com/site_report?url=$hosts"
+					" -url https://www.censys.io/ipv4?q=$hosts")
+					
+		x-www-browser --new-tab ${dorks[@]} 2> /dev/null &
+		
+		recon
+		;;
+	*)
+		recon
+		;;
+	esac
+	}
+	
+
 #     _____                       _               __  __           _       _      
 #    / ____|                     (_)             |  \/  |         | |     | |     
 #   | (___   ___ __ _ _ __  _ __  _ _ __   __ _  | \  / | ___   __| |_   _| | ___ 
@@ -710,9 +788,11 @@ function droopescan_module {
 	
 	
 function liferayscan_module {
-	echo -e "What is your host? e.g www.example.com  \c"
+	echo -e "What is your Protocol? e.g [http/https]  \c"
+	read protocols
+	echo -e "What is your host? e.g [www.example.com]  \c"
 	read hosts
-	xterm -hold -e "./$application_path$liferayscan_folder/LiferayScan -u $hosts" &
+	xterm -hold -e "./$application_path$liferayscan_folder/LiferayScan -u $protocols://$hosts" &
 	CMS_Interface
 	}
 
@@ -731,6 +811,57 @@ function fatrat_module {
 	gnome-terminal -e "fatrat" &
 	exploit_interface
 	}
+
+	
+
+
+#    _______          _   __  __           _       _      
+#   |__   __|        | | |  \/  |         | |     | |     
+#      | | ___   ___ | | | \  / | ___   __| |_   _| | ___ 
+#      | |/ _ \ / _ \| | | |\/| |/ _ \ / _` | | | | |/ _ \
+#      | | (_) | (_) | | | |  | | (_) | (_| | |_| | |  __/
+#      |_|\___/ \___/|_| |_|  |_|\___/ \__,_|\__,_|_|\___|
+#                                                         
+#                                                         
+
+
+	
+function mantra_module {
+	xterm -e "owasp-mantra-ff" &
+	tool_interface
+}
+
+
+function cupp_module {
+	echo -e "$OKRED"
+	echo -e "Select from the menu:
+
+1 : Generate Wordlist
+2 : Download Wordlist $RESET
+	"
+	read actions
+	case "$actions" in
+	"1")
+		cd $application_path$cupp_folder
+		python cupp.py -i
+		
+		cd $default_directory
+		xdg-open $application_path$cupp_folder
+		tool_interface
+		;;
+	"2")
+		cd $application_path$cupp_folder
+		python cupp.py -l
+		cd $default_directory
+		xdg-open $application_path$cupp_folder/dictionaries
+		tool_interface
+		;;
+	*)
+		tool_interface
+		;;
+	esac
+}
+
 
 	
 #    _____       _             __               
@@ -769,6 +900,9 @@ Select from the menu:
 	1 : Reconnaisance
 	2 : Vulnerability Scanning
 	3 : Exploit
+	4 : Post Exploit - $OKRED TODO $RESET $OKGREEN
+	5 : Forensic - $OKRED TODO $RESET $OKGREEN
+	6 : Tools
 	9 : Update $SELF script
 	
 	99: Exit
@@ -786,6 +920,15 @@ Select from the menu:
 		;;
 	"3")
 		exploit_interface
+		;;
+	"4")
+		init
+		;;
+	"5")
+		init
+		;;
+	"6")
+		tool_interface
 		;;
 	"9")
 		runSelfUpdate
@@ -817,8 +960,8 @@ Select from the 'Reconnaisance' menu:
 	6  : Dirb - $OKORANGE Hidden Web Directory Bruteforcer $RESET $OKGREEN
 	7  : Metagoofil - $OKORANGE Information gathering tool $RESET $OKGREEN
 	8  : HTTP Method Analyzer - $OKORANGE Http Method Analyzer $RESET $OKGREEN
-	9  : HTTP Method Analyzer - $OKORANGE Http Method Analyzer $RESET $OKGREEN
-	12  : Maltego - $OKORANGE Reconnaissance framework $RESET $OKGREEN
+	9  : Google Dork - $OKORANGE Information from Google / Informative site $RESET $OKGREEN
+	12 : Maltego - $OKORANGE Reconnaissance framework $RESET $OKGREEN
 	13 : Recon-Ng - $OKORANGE Web Reconnaissance framework $RESET $OKGREEN
 	
 	99 : Return		
@@ -853,7 +996,7 @@ Select from the 'Reconnaisance' menu:
 		http_method_module
 		;;
 	"9")
-		http_method_module
+		google_dork_module
 		;;
 	"12")
 		maltego_module
@@ -944,11 +1087,11 @@ function va_scanning {
 Select from the 'Vulnerability Scanning' menu:
 	
 	1 : Arachni - $OKORANGE  Web Application Security Scanner $RESET $OKGREEN
-	2 : Openvas - $OKORANGE (Halted!) Vulnerability Scanning $RESET $OKGREEN
+	2 : Openvas - $OKORANGE  Vulnerability Scanning $RESET $OKGREEN
 	3 : Nessus - $OKORANGE Vulnerability Scanning Tool $RESET $OKGREEN
 	4 : Burpsuit - $OKORANGE  Toolkit for Web Application Security Testing $RESET $OKGREEN
 	5 : CMS Vulnerability Scanner - $OKORANGE Wordpress,Joomla,Drupal,Liferay  $RESET $OKGREEN
-	5 : OWASP Top 10 Vulnerability Scanner - $OKORANGE SQLi,XXS,LFI,RFI etc  $RESET $OKGREEN
+	6 : OWASP Top 10 Vulnerability Scanner - $OKORANGE SQLi,XXS,LFI,RFI etc  $RESET $OKGREEN
 	
 	99 : Return		
 	$RESET"
@@ -1059,20 +1202,20 @@ Select from the 'Nmap command' menu:
 	
 	case "$choice" in
 	"1")
-		nmap_module
+		OWASP_Interface
 		;;
 	"2")
-		nmap_udp_module
+		OWASP_Interface
 		;;
 	"3")
-		nmap_aio_enum_module
+		OWASP_Interface
 		;;
 	"4")
-		nmap_aio_ssl_module
+		OWASP_Interface
 		;;
 	*)
 		#echo "Huhhh! Wrong input!"
-		recon
+		va_scanning
 		;;
 	esac
 }
@@ -1105,6 +1248,53 @@ Select from the 'Vulnerability Scanning' menu:
 			fatrat_module
 		else
 			install_apps fatrat
+		fi
+		;;
+	*)
+		#echo "Huhhh! Wrong input!"
+		init
+		;;
+	esac
+}
+
+
+#Tools Interface
+function tool_interface {
+	main_logo
+	echo -e "$OKGREEN
+[+]       Coded BY Muzaffar Mohamed       [+] 
+[-]           coco.oligococo.tk           [-]
+[-]       	    Local IP:         	  [-]$RESET $OKORANGE
+[-]             $ip_local      	  [-]$RESET $OKGREEN  
+
+Select from the 'Vulnerability Scanning' menu:
+	
+	1 : Owasp Mantra - $OKORANGE  Web Pentest Browser Framework $RESET $OKGREEN
+	2 : CUPP - $OKORANGE  Wordlist Downloader and Generator $RESET $OKGREEN
+	
+	99 : Return		
+	$RESET"
+	
+	echo -e "Holla! Your choice is? \c"
+	read  choice
+	
+	case "$choice" in
+	"1")		
+		#Check Mantra if installed	
+		if apps_exist "owasp-mantra-ff" ; then
+			#Execute Mantra
+			mantra_module
+		else
+			install_apps mantra
+		fi
+		;;
+	"2")		
+		#Check cupp if installed	
+		if apps_exist "./$application_path$cupp_folder/cupp.py" ; then
+			#Execute Mantra
+			cupp_module
+		else
+			install_apps cupp
 		fi
 		;;
 	*)
@@ -1152,4 +1342,4 @@ init
 # python3 altinstall
 # autodownload nmap NSE script
 # Use another frame to install openvas
-# #
+# 
