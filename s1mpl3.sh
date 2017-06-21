@@ -20,7 +20,7 @@ default_directory=`pwd`
 
 declare -r ip_local=$(ip -4 route get 8.8.8.8 | awk {'print $7'} | tr -d '\n')
 
-declare -r app_version='V 6.8'
+declare -r app_version='V 6.9'
 
 declare -r application_path='Application/'
 declare -r report_path='Report/'
@@ -28,6 +28,9 @@ declare -r bin_path='/usr/local/bin'
 
 declare -r nmap_git='https://github.com/nmap/nmap.git'
 declare -r nmap_folder='nmap'
+
+declare -r theHarvester_git='https://github.com/laramies/theHarvester.git'
+declare -r theHarvester_folder='theHarvester'
 
 declare -r nikto_git='https://github.com/sullo/nikto.git'
 declare -r nikto_folder='nikto'
@@ -62,6 +65,9 @@ declare -r cupp_folder='cupp'
 
 declare -r nessus_git='http://www.coco.oligococo.tk/file/Nessus-6.10.5-debian6_amd64.deb'
 
+declare -r phpsploit_git='https://github.com/nil0x42/phpsploit.git'
+declare -r phpsploit_folder='phpsploit'
+
 declare -a required_apps=("nmap" 
 						"nikto" 
 						"sniper" 
@@ -72,6 +78,7 @@ declare -a required_apps=("nmap"
 						"./$application_path$joomlavs_folder/joomlavs.rb"
 						"./$application_path$liferayscan_folder/LiferayScan"
 						"./$application_path$droopescan_folder/droopescan"
+						"./$application_path$theHarvester_folder/theHarvester.py"
 						)
 						
 
@@ -162,8 +169,8 @@ function install_apps {
 		install_message $1
 		install_git $sniper_git $sniper_folder
 		chmod 777 $application_path$sniper_folder/install.sh &> /dev/null
-		chmod 777 $application_path$sniper_folder/sniper.sh &> /dev/null
-		xterm -e "./$application_path$sniper_folder/install.sh & yes & y" &
+		chmod 777 $application_path$sniper_folder/sniper &> /dev/null
+		gnome-terminal -x "./$application_path$sniper_folder/install.sh" &
 		wait
 		rm -r $application_path$sniper_folder
 		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"		
@@ -187,6 +194,14 @@ function install_apps {
 		wait
 		cd $default_directory
 		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"
+		;;
+	"./$application_path$theHarvester_folder/theHarvester.py")
+		#Download and install theHarvester
+		install_message theHarvester
+		install_git $theHarvester_git $theHarvester_folder
+		#Install apps
+		chmod +x $application_path$theHarvester_folder/theHarvester.py &> /dev/null
+		echo -e "$OKGREEN	[✔-OK!]::[Apps]: theHarvester $RESET"
 		;;
 	"./$application_path$arachni_folder/arachni_web")
 		#Download and install arachni
@@ -497,27 +512,23 @@ function sniper_module {
 	echo -e "What is your host? e.g. www.example.com  \c"
 	read hosts
 	
-	echo -e "On Port? e.g. 80  \c"
-	read ports
-	#echo -e "Do a passive (Stealth) scan? (y/n) \c"
-	#read  choice
+	#echo -e "On Port? e.g. 80  \c"
+	#read ports
+	echo -e "Do a passive (Stealth) scan? (y/n) \c"
+	read  choice
 	
-	#if [ $choice != "y" ]
-	#then
+	if [ $choice != "y" ]
+	then
 	  #If not yes, use web scan
-	  #scan_mode="web"
-	#else
+	  scan_mode="web"
+	else
 	  #Use stealth scan
-	  #scan_mode="stealth"
-	#fi
+	  scan_mode="stealth"
+	fi
 	
 	mkdir -p $report_path$hosts 2> /dev/null
 	output="Sniper_Output"
-	xterm -e "sniper $hosts port $ports |& tee -a $report_path$hosts/$output.txt xdg-open && $report_path$hosts/$output.txt 2> /dev/null" &
-	#wait
-	#xterm -e "sniper $hosts $scan_mode report <<< $hosts" &
-	#wait
-	#xterm -e "sniper loot <<< $hosts" &
+	xterm -e "sniper $hosts $scan_mode |& tee -a $report_path$hosts/$output.txt && xdg-open $report_path$hosts/$output.txt 2> /dev/null" &
 	recon
 	}
 	
@@ -562,8 +573,20 @@ function wig_module {
 	mkdir -p $report_path$hosts 2> /dev/null
 	#./Application/wig/wig.py http://localhost:9292  &>> Report/localhost/CMS_Identifier_Report.txt
 	echo  -e $OKRED & echo -e "Scanning...This process might take same time, please wait..$RESET" & echo
-	./Application/wig/wig.py $protocols://$hosts  |& tee $report_path$hosts/$output.txt
+	./$application_path$wig_folder/wig.py $protocols://$hosts  |& tee $report_path$hosts/$output.txt &
+	wait
 	xdg-open $report_path$hosts/$output.txt 2> /dev/null &
+	recon
+	}	
+
+
+function theHarvester_module {
+	echo -e "What is your host? e.g. www.example.com  \c"
+	read hosts
+	output="Email_Domain_Harvest_Report"
+	mkdir -p $report_path$hosts 2> /dev/null
+	xterm -e "python $application_path$theHarvester_folder/theHarvester.py -d $hosts -l 500 -b all -h email_harvest.html" &
+	#python $application_path$theHarvester_folder/theHarvester.py -d $hosts -l 500 -b all -h email_harvest.html |& tee $report_path$hosts/$output.txt
 	recon
 	}	
 	
@@ -652,6 +675,8 @@ function google_dork_module {
 					" -url https://crt.sh/?q=$hosts"
 					" -url https://www.tcpiputils.com/browse/domain/$hosts"
 					" -url http://toolbar.netcraft.com/site_report?url=$hosts"
+					" -url https://www.shodan.io/search?query=$hosts"
+					" -url https://www.ssllabs.com/ssltest/analyze.html?d=$host"
 					" -url https://www.censys.io/ipv4?q=$hosts")
 					
 		x-www-browser --new-tab ${dorks[@]} 2> /dev/null &
@@ -900,7 +925,7 @@ Select from the menu:
 	1 : Reconnaisance
 	2 : Vulnerability Scanning
 	3 : Exploit
-	4 : Post Exploit - $OKRED TODO $RESET $OKGREEN
+	4 : Post Exploit
 	5 : Forensic - $OKRED TODO $RESET $OKGREEN
 	6 : Tools
 	9 : Update $SELF script
@@ -961,11 +986,13 @@ Select from the 'Reconnaisance' menu:
 	7  : Metagoofil - $OKORANGE Information gathering tool $RESET $OKGREEN
 	8  : HTTP Method Analyzer - $OKORANGE Http Method Analyzer $RESET $OKGREEN
 	9  : Google Dork - $OKORANGE Information from Google / Informative site $RESET $OKGREEN
+	10 : theHarvester - $OKORANGE Email,Domain and Virtual Server enumerator  $RESET $OKGREEN
 	12 : Maltego - $OKORANGE Reconnaissance framework $RESET $OKGREEN
 	13 : Recon-Ng - $OKORANGE Web Reconnaissance framework $RESET $OKGREEN
 	
 	99 : Return		
 	$RESET"
+	
 	
 	echo -e "Holla! Your choice is? \c"
 	read  choice
@@ -997,6 +1024,9 @@ Select from the 'Reconnaisance' menu:
 		;;
 	"9")
 		google_dork_module
+		;;
+	"10")
+		theHarvester_module
 		;;
 	"12")
 		maltego_module
