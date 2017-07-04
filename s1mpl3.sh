@@ -20,8 +20,8 @@ default_directory=`pwd`
 
 declare -r ip_local=$(ip -4 route get 8.8.8.8 | awk {'print $7'} | tr -d '\n')
 
-declare -r app_version='V 6.9'
-
+declare -r app_version='V 1.0.1'
+	
 declare -r application_path='Application/'
 declare -r report_path='Report/'
 declare -r bin_path='/usr/local/bin'
@@ -140,7 +140,7 @@ function wordlist (){
 	}
 
 	
-#Convert XML to HTML
+#Convert NMAP XML to HTML
 function xml2html () {
 	xsltproc $report_path$1/$2.xml -o $report_path$1/$2.html 2> /dev/null
 	rm $report_path$1/$2.xml 2> /dev/null
@@ -160,7 +160,7 @@ function install_apps {
 	"nikto")
 		#Download and install nikto	
 		install_message $1
-		xterm -e "apt-get install nikto & yes" &
+		xterm -e "apt-get install nikto && yes" &
 		wait
 		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"
 		;;
@@ -677,7 +677,8 @@ function google_dork_module {
 					" -url http://toolbar.netcraft.com/site_report?url=$hosts"
 					" -url https://www.shodan.io/search?query=$hosts"
 					" -url https://www.ssllabs.com/ssltest/analyze.html?d=$host"
-					" -url https://www.censys.io/ipv4?q=$hosts")
+					" -url https://www.censys.io/ipv4?q=$hosts"
+					" -url https://www.builtwith.com/$hosts")
 					
 		x-www-browser --new-tab ${dorks[@]} 2> /dev/null &
 		
