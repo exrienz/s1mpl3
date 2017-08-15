@@ -9,6 +9,11 @@
 #                                          
 #     
 
+
+#System
+declare -r app_version='BETA'
+
+
 #Auto Update Script
 set -o errexit
 UPDATE_BASE=https://raw.githubusercontent.com/exrienz/s1mpl3/master/s1mpl3.sh
@@ -18,77 +23,11 @@ reldir=`dirname $0`
 cd $reldir
 default_directory=`pwd`
 
+#Current LAN IP
 declare -r ip_local=$(ip -4 route get 8.8.8.8 | awk {'print $7'} | tr -d '\n')
 
-declare -r app_version='V 1.0.1'
-	
-declare -r application_path='Application/'
-declare -r report_path='Report/'
-declare -r bin_path='/usr/local/bin'
 
-declare -r nmap_git='https://github.com/nmap/nmap.git'
-declare -r nmap_folder='nmap'
-
-declare -r theHarvester_git='https://github.com/laramies/theHarvester.git'
-declare -r theHarvester_folder='theHarvester'
-
-declare -r nikto_git='https://github.com/sullo/nikto.git'
-declare -r nikto_folder='nikto'
-
-declare -r sniper_git='https://github.com/1N3/Sn1per.git'
-declare -r sniper_folder='Sn1per'
-
-declare -r fatrat_git='https://github.com/Screetsec/TheFatRat.git'
-declare -r fatrat_folder='TheFatRat'
-
-declare -r metagoofil_git='https://github.com/laramies/metagoofil.git'
-declare -r metagoofil_folder='metagoofil'
-
-declare -r wig_git='https://github.com/jekyc/wig.git'
-declare -r wig_folder='wig'
-
-declare -r arachni_git='https://github.com/Arachni/arachni/releases/download/v1.5.1/arachni-1.5.1-0.5.12-linux-x86_64.tar.gz'
-declare -r arachni_folder='arachni/bin'
-
-declare -r joomlavs_git='https://github.com/rastating/joomlavs.git'
-declare -r joomlavs_folder='joomlavs'
-
-declare -r droopescan_git='https://github.com/droope/droopescan.git'
-declare -r droopescan_folder='droopescan'
-
-declare -r liferayscan_git='https://github.com/bcoles/LiferayScan.git'
-declare -r liferayscan_folder='LiferayScan/bin'
-declare -r liferayscan_folder_main='LiferayScan'
-
-declare -r cupp_git='https://github.com/Mebus/cupp.git'
-declare -r cupp_folder='cupp'
-
-declare -r nessus_git='http://www.coco.oligococo.tk/file/Nessus-6.10.5-debian6_amd64.deb'
-
-declare -r phpsploit_git='https://github.com/nil0x42/phpsploit.git'
-declare -r phpsploit_folder='phpsploit'
-
-declare -a required_apps=("nmap" 
-						"nikto" 
-						"sniper" 
-						"./$application_path$metagoofil_folder/metagoofil.py" 
-						"./$application_path$wig_folder/wig.py"
-						"./$application_path$arachni_folder/arachni_web"
-						"/etc/init.d/nessusd"
-						"./$application_path$joomlavs_folder/joomlavs.rb"
-						"./$application_path$liferayscan_folder/LiferayScan"
-						"./$application_path$droopescan_folder/droopescan"
-						"./$application_path$theHarvester_folder/theHarvester.py"
-						)
-						
-
-declare -a wordlist_path=("/usr/share/wordlists/wfuzz/general/common.txt"
-						"/usr/share/wordlists/wfuzz/general/medium.txt"
-						"/usr/share/wordlists/wfuzz/general/big.txt"
-						"/usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt"
-						"/usr/share/wordlists/fasttrack.txt")
-
-
+#COLOR CODE
 OKBLUE='\033[94m'
 OKRED='\033[91m'
 OKGREEN='\033[92m'
@@ -96,16 +35,65 @@ OKORANGE='\033[93m'
 RESET='\e[0m'
 
 
-#    ______                _   _             
-#   |  ____|              | | (_)            
-#   | |__ _   _ _ __   ___| |_ _  ___  _ __  
-#   |  __| | | | '_ \ / __| __| |/ _ \| '_ \ 
-#   | |  | |_| | | | | (__| |_| | (_) | | | |
-#   |_|   \__,_|_| |_|\___|\__|_|\___/|_| |_|
-#                                            
-#  
+#SYSTEM SETTING
+declare -r application_path='Application/'
+declare -r report_path='Report/'
+declare -r port_analysis_path='Port_Analysis/'
+declare -r bin_path='/usr/local/bin'
+DISABLE_POSTGRESQL="true" # disabling postgresql startup, assuming it's running already
 
-	
+#URL VARIABLE
+declare -r pa_whois_url="http://whois.domaintools.com/"
+declare -r pa_nmap_url="https://suip.biz/?act=nmap"
+declare -r pa_hosmap_url="https://suip.biz/?act=hostmap"
+declare -r pa_nikto_url="https://suip.biz/?act=nikto"
+declare -r pa_whatsweb_url="https://suip.biz/?act=whatweb"
+declare -r pa_wpscan_url="https://suip.biz/?act=wpscan"
+declare -r pa_droopescan_url="https://suip.biz/?act=droopescan"
+declare -r pa_sqlmap_url="https://suip.biz/?act=sqlmap"
+declare -r pa_aio_url="http://pentest-tools.security-audit.com/test/index.php"
+declare -r pa_dnsdumpster_url="https://dnsdumpster.com/"
+declare -r pa_aio_view_dns_url_i="http://viewdns.info/"
+declare -r pa_aio_view_dns_url_ii="http://www.gwebtools.com.br/"
+
+
+#APPLICATION SETTING
+
+declare -r theHarvester_git='https://github.com/laramies/theHarvester.git'
+declare -r theHarvester_folder='theHarvester'
+
+#AUTOINSTALL APPLICATION
+declare -a required_apps=("nmap" 
+						"nikto" 
+						"sniper" 
+						"./$application_path$wig_folder/wig.py"
+						"./$application_path$arachni_folder/arachni_web"
+						"/etc/init.d/nessusd"
+						"./$application_path$joomlavs_folder/joomlavs.rb"
+						"./$application_path$liferayscan_folder/LiferayScan"
+						"./$application_path$droopescan_folder/droopescan"
+						"./$application_path$theHarvester_folder/theHarvester.py"
+						)						
+
+#WORDLIST CONFIGURATION
+declare -a wordlist_path=("/usr/share/wordlists/wfuzz/general/common.txt"
+						"/usr/share/wordlists/wfuzz/general/medium.txt"
+						"/usr/share/wordlists/wfuzz/general/big.txt"
+						"/usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt"
+						"/usr/share/wordlists/fasttrack.txt")
+
+
+########################################################################################################################################################
+#    _    _ _   _ _     
+#   | |  | | | (_) |    
+#   | |  | | |_ _| |___ 
+#   | |  | | __| | / __|
+#   | |__| | |_| | \__ \
+#    \____/ \__|_|_|___/
+#                       
+#                       
+
+
 function apps_exist {
 	type "$1" &> /dev/null ;
 	}
@@ -174,14 +162,6 @@ function install_apps {
 		wait
 		rm -r $application_path$sniper_folder
 		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"		
-		;;
-	"./$application_path$metagoofil_folder/metagoofil.py")
-		#Download and install Metagoofil
-		install_message metagoofil
-		install_git $metagoofil_git $metagoofil_folder
-		chmod +x $application_path$metagoofil_folder/metagoofil.py &> /dev/null
-		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"
-		#Install apps
 		;;
 	"./$application_path$wig_folder/wig.py")
 		#Download and install Wig
@@ -281,66 +261,6 @@ function install_apps {
 			;;
 		esac
 		;;
-	"fatrat")
-		echo -e "Fatrat module is not available, install now? (It might take a looong time!) y/n \c"
-		read actions
-		case "$actions" in
-		"y")
-			#Download and install fatrat
-			install_message Fatrat
-			if [ -d "$application_path$fatrat" ]; then
-			  # if true this block of code will execute
-				xterm -e "./$application_path$fatrat_folder/setup.sh" &
-				wait
-			else
-				install_git $fatrat_git $fatrat_folder
-				chmod +x $application_path$fatrat_folder/powerfull.sh
-				chmod +x $application_path$fatrat_folder/setup.sh
-				gnome-terminal -x "./$application_path$fatrat_folder/setup.sh" &
-				wait
-			fi
-			#rm -r $application_path$fatrat_folder
-			echo -e "$OKGREEN	[✔-OK!]::[Apps]: Fatrat $RESET"	
-			exploit_interface
-			;;
-		*)
-			exploit_interface
-			;;
-		esac
-		;;
-	"mantra")
-		echo -e "Mantra module is not available, install now? (It might take some time!) y/n \c"
-		read actions
-		case "$actions" in
-		"y")
-			#Download and install fatrat
-			install_message Mantra
-			xterm -e "apt-get install owasp-mantra-ff" &
-			wait
-			echo -e "$OKGREEN	[✔-OK!]::[Apps]: Owasp Mantra $RESET"	
-			tool_interface
-			;;
-		*)
-			tool_interface
-			;;
-		esac
-		;;
-	"cupp")
-		echo -e "Cupp module is not available, install now? (It might take some time!) y/n \c"
-		read actions
-		case "$actions" in
-		"y")
-			#Download and install Cupp
-			install_message Cupp
-			install_git $cupp_git $cupp_folder
-			echo -e "$OKGREEN	[✔-OK!]::[Apps]: Owasp Mantra $RESET"
-			tool_interface
-			;;
-		*)
-			tool_interface
-			;;
-		esac
-		;;
 	*)
 		echo ""
 		echo -e "$OKGREEN Enjoy! $RESET"
@@ -389,26 +309,190 @@ EOF
 	exec /bin/bash updateScript.sh
 	}
 
+
+
+
+
+########################################################################################################################################################
+#    _____          ______                _   _             
+#   |  __ \ /\     |  ____|              | | (_)            
+#   | |__) /  \    | |__ _   _ _ __   ___| |_ _  ___  _ __  
+#   |  ___/ /\ \   |  __| | | | '_ \ / __| __| |/ _ \| '_ \ 
+#   | |  / ____ \  | |  | |_| | | | | (__| |_| | (_) | | | |
+#   |_| /_/    \_\ |_|   \__,_|_| |_|\___|\__|_|\___/|_| |_|
+#                                                           
+#                                                           
+
+
+#Passive Enumeration Whois
+function pa_whois(){
+	echo -e "What is your host? e.g. example.com  \c"
+	read hosts
+	x-www-browser --new-tab $pa_whois_url$hosts &
+	passive_recon_interface
+}
+
+
+#Passive Google Dorks
+function pa_google_dork {
+	echo -e "$OKRED"
+	echo -e "This module open lots of tab. Is it ok? [y/n] \c"
+	read actions
+	echo -e "$RESET"
+	case "$actions" in
+	"y")
+		
+	echo -e "What is your host? e.g example.com  \c"
+	read hosts
+
+	declare -a dorks=(" -url https://www.google.com/search?q=site:$hosts+intitle:index.of"
+					" -url https://www.google.com/search?q=site:$hosts+ext:xml+|+ext:conf+|+ext:cnf+|+ext:reg+|+ext:inf+|+ext:rdp+|+ext:cfg+|+ext:txt+|+ext:ora+|+ext:ini+|+ext:sql+|+ext:dbf+|+ext:mdb+|+ext:log+|+ext:bkf+|+ext:bkp+|+ext:bak+|+ext:old+|+ext:backup"
+					" -url https://www.google.com/search?q=site:$hosts+inurl:login"
+					" -url https://www.google.com/search?q=site:$hosts+ext:doc+|+ext:docx+|+ext:odt+|+ext:pdf+|+ext:rtf+|+ext:sxw+|+ext:psw+|+ext:ppt+|+ext:pptx+|+ext:pps+|+ext:csv"
+					" -url https://www.google.com/search?q=site:$hosts+ext:action+OR+struts+OR+ext:do"
+					" -url https://www.google.com/search?q=site:$hosts+inurl:redir+OR+inurl:url+OR+inurl:redirect+OR+inurl:return+OR+inurl:src=http+OR+inurl:r=http"
+					" -url https://www.google.com/search?q=site:$hosts+inurl:wp-+OR+inurl:plugin+OR+inurl:upload+OR+inurl:download"
+					" -url https://www.google.com/search?q=site:$hosts+inurl:readme+OR+inurl:license+OR+inurl:install+OR+inurl:setup+OR+inurl:config"
+					" -url https://www.google.com/search?q=site:$hosts+inurl:shell+OR+inurl:backdoor+OR+inurl:wso+OR+inurl:cmd+OR+shadow+OR+passwd+OR+boot.ini+OR+inurl:backdoor"
+					" -url https://www.google.com/search?q=site:$hosts+username+OR+password+OR+login+OR+root+OR+admin"	
+					" -url https://www.google.com/search?q=site:$hosts+ext:php+intitle:phpinfo+%22published+by+the+PHP+Group%22"
+					" -url https://www.google.com/search?q=site:$hosts+intext:%22sql+syntax+near%22+|+intext:%22syntax+error+has+occurred%22+|+intext:%22incorrect+syntax+near%22+|+intext:%22unexpected+end+of+SQL+command%22+|+intext:%22Warning:+mysql_connect()%22+|+intext:%22Warning:+mysql_query()%22+|+intext:%22Warning:+pg_connect()%22"
+					" -url https://www.google.com/search?q=site:pastebin.com+$hosts"
+					" -url https://www.google.com/search?q=site:linkedin.com+employees+$hosts"
+					" -url https://www.google.com/search?q=site:*.*.$hosts"
+					" -url https://www.google.com/search?q=inurl:'/phpinfo.php'+$hosts"
+					" -url https://www.google.com/search?q=inurl:'/phpinfo.php'+OR+inurl:'.htaccess'+OR+inurl:'/.git'+$hosts+-github"
+					)
+					
+		x-www-browser --new-tab ${dorks[@]} 2> /dev/null &
+		
+		passive_recon_interface
+		;;
+	*)
+		passive_recon_interface
+		;;
+	esac
+	}
+
 	
-#    _____                        __  __           _       _      
-#   |  __ \                      |  \/  |         | |     | |     
-#   | |__) |___  ___ ___  _ __   | \  / | ___   __| |_   _| | ___ 
-#   |  _  // _ \/ __/ _ \| '_ \  | |\/| |/ _ \ / _` | | | | |/ _ \
-#   | | \ \  __/ (_| (_) | | | | | |  | | (_) | (_| | |_| | |  __/
-#   |_|  \_\___|\___\___/|_| |_| |_|  |_|\___/ \__,_|\__,_|_|\___|
-#                                                                 
-#                                                                 
+#Passive AIO Site Information
+function pa_aio_site {
+	echo -e "$OKRED"
+	echo -e "This module open lots of tab. Is it ok? [y/n] \c"
+	read actions
+	echo -e "$RESET"
+	case "$actions" in
+	"y")
+		
+	echo -e "What is your host? e.g example.com  \c"
+	read hosts
+
+	declare -a dorks=(" -url https://www.threatcrowd.org/domain.php?domain=$hosts"
+					" -url https://www.tcpiputils.com/browse/domain/$hosts"
+					" -url http://toolbar.netcraft.com/site_report?url=$hosts"
+					" -url https://www.shodan.io/search?query=$hosts"
+					" -url https://www.censys.io/ipv4?q=$hosts"
+					" -url https://www.builtwith.com/$hosts"
+					" -url https://web.archive.org/web/*/$hosts"
+					" -url https://securityheaders.io/?q=$hosts"
+					" -url https://www.openbugbounty.org/search/?search=$hosts&type=hosts"
+					" -url https://crt.sh/?q=$hosts"
+					" -url https://www.ssllabs.com/ssltest/analyze.html?d=$hosts&latest")
+					
+		x-www-browser --new-tab ${dorks[@]} 2> /dev/null &
+		
+		passive_recon_interface
+		;;
+	*)
+		passive_recon_interface
+		;;
+	esac
+	}
+	
+	
+#Passive Online Tools
+function pa_online_tools {		
+	x-www-browser --new-tab -url "$1" 2> /dev/null &
+}
+
+
+#Passive Online Credential Harvester
+function pa_harvester {
+	echo -e "What is your host? e.g. example.com  \c"
+	read hosts
+	output="Email_Domain_Harvest_Report"
+	mkdir -p $report_path$hosts 2> /dev/null
+	xterm -e "python $application_path$theHarvester_folder/theHarvester.py -d $hosts -l 500 -b all -f $output.html; mv $output.html $report_path$hosts; rm -f $output.xml; x-www-browser --new-tab -url '$report_path$hosts/$output.html'" &
+	passive_recon_interface
+	}
+	
+	
+function pa_basic {
+	echo -e "What is your host? e.g. example.com  \c"
+	read hosts
+	output="Basic_Passive_Report"
+	# site_ip=dig +short $hosts | awk '{ print ; exit }'
+	mkdir -p $report_path$hosts 2> /dev/null
+	#rm $report_path$hosts/$output.txt 2> /dev/null	# Remove if exist
+	echo
+	echo "Whois Info============================================">> $report_path$hosts/$output.txt;
+	curl http://api.hackertarget.com/whois/?q=$hosts >> $report_path$hosts/$output.txt;echo >> $report_path$hosts/$output.txt;echo >> $report_path$hosts/$output.txt;
+	echo "Search Host============================================">> $report_path$hosts/$output.txt; 
+	curl http://api.hackertarget.com/hostsearch/?q=$hosts >> $report_path$hosts/$output.txt;echo >> $report_path$hosts/$output.txt;echo >> $report_path$hosts/$output.txt;
+	echo "NMap Data (Default Scan)============================================">> $report_path$hosts/$output.txt;
+	curl http://api.hackertarget.com/nmap/?q=$hosts >> $report_path$hosts/$output.txt;echo >> $report_path$hosts/$output.txt;echo >> $report_path$hosts/$output.txt;
+	echo "HTTP Header============================================">> $report_path$hosts/$output.txt; 
+	curl http://api.hackertarget.com/httpheaders/?q=$hosts >> $report_path$hosts/$output.txt;echo >> $report_path$hosts/$output.txt;echo >> $report_path$hosts/$output.txt;
+	echo "Geolocation============================================">> $report_path$hosts/$output.txt;
+	curl http://api.hackertarget.com/geoip/?q=$hosts >> $report_path$hosts/$output.txt;echo >> $report_path$hosts/$output.txt;echo >> $report_path$hosts/$output.txt;
+	echo "URL List============================================">> $report_path$hosts/$output.txt; 
+	curl https://api.hackertarget.com/pagelinks/?q=$hosts >> $report_path$hosts/$output.txt;echo >> $report_path$hosts/$output.txt;echo >> $report_path$hosts/$output.txt;
+	echo "Traceroute============================================">> $report_path$hosts/$output.txt; 
+	curl https://api.hackertarget.com/mtr/?q=$hosts >> $report_path$hosts/$output.txt;echo >> $report_path$hosts/$output.txt;echo >> $report_path$hosts/$output.txt;
+	echo "DNS Lookup============================================">> $report_path$hosts/$output.txt; 
+	curl http://api.hackertarget.com/dnslookup/?q=$hosts >> $report_path$hosts/$output.txt;echo >> $report_path$hosts/$output.txt;echo >> $report_path$hosts/$output.txt;
+	echo "Reverse DNS============================================">> $report_path$hosts/$output.txt; 
+	curl https://api.hackertarget.com/reversedns/?q=$hosts >> $report_path$hosts/$output.txt;echo >> $report_path$hosts/$output.txt;echo >> $report_path$hosts/$output.txt;
+	# echo "Reverse IP Lookup============================================">> $report_path$hosts/$output.txt; 
+	# curl http://api.hackertarget.com/reverseiplookup/?q=$hosts >> $report_path$hosts/$output.txt; 
+	
+	x-www-browser --new-tab -url $report_path$hosts/$output.txt &
+	passive_recon_interface
+
+	}
+
+
+
+########################################################################################################################################################
+#             _____   ______                _   _             
+#       /\   / ____| |  ____|              | | (_)            
+#      /  \ | |      | |__ _   _ _ __   ___| |_ _  ___  _ __  
+#     / /\ \| |      |  __| | | | '_ \ / __| __| |/ _ \| '_ \ 
+#    / ____ \ |____  | |  | |_| | | | | (__| |_| | (_) | | | |
+#   /_/    \_\_____| |_|   \__,_|_| |_|\___|\__|_|\___/|_| |_|
+#                                                             
+#                                                             
 
 function nmap_module {
 	echo -e "What is your host? e.g. www.example.com  \c"
 	read hosts
 	mkdir -p $report_path$hosts 2> /dev/null
 	output="Nmap_Intense_Scan_Report"
-	nmap -p- -A -sV -sC --version-intensity 5 --script=whois-ip,banner,iscsi-brute,isns-info,ntp-info $hosts -oX $report_path$hosts/$output.xml 2> /dev/null
+	#nmap -T4 -A -v --script=whois-ip,banner,iscsi-brute,isns-info,ntp-info,fingerprint-strings,HTTPAuth,HTTPtrace $hosts -oX $report_path$hosts/$output.xml 2> /dev/null
+	nmap -T4 -A -v --script=whois-ip,banner,iscsi-brute,isns-info,ntp-info,fingerprint-strings $hosts -oX $report_path$hosts/$output.xml 2> /dev/null
 	xml2html $hosts $output
-	nmap_interface
+	active_recon_nmap_interface
 	}
 
+function nmap_stealth_module {
+	echo -e "What is your host? e.g. www.example.com  \c"
+	read hosts
+	mkdir -p $report_path$hosts 2> /dev/null
+	output="Nmap_Stealth_Scan_Report"
+	nmap --mtu 24 -A -v  $hosts -oX $report_path$hosts/$output.xml 2> /dev/null
+	xml2html $hosts $output
+	active_recon_nmap_interface
+	}	
 	
 function nmap_udp_module {
 	echo -e "What is your host? e.g. www.example.com  \c"
@@ -417,7 +501,7 @@ function nmap_udp_module {
 	output="Nmap_UDP_Scan_Report"
 	nmap -sU $hosts --script=banner -oX $report_path$hosts/$output.xml 2> /dev/null
 	xml2html $hosts $output
-	nmap_interface
+	active_recon_nmap_interface
 	}
 
 	
@@ -430,7 +514,7 @@ function nmap_aio_enum_module {
 	output="Nmap_Http_Enum_Scan_Report"
 	nmap -p $portz -sV -sC --script=http-title,http-method-tamper,http-traceroute,http-waf-detect,http-waf-fingerprint,http-internal-ip-disclosure,http-server-header,whois-ip,http-exif-spider,http-headers,http-referer-checker,http-enum,http-open-redirect,http-phpself-xss,http-xssed,http-userdir-enum,http-sitemap-generator,http-svn-info,http-unsafe-output-escaping,http-default-accounts,http-aspnet-debug,http-php-version,http-cross-domain-policy,http-comments-displayer,http-backup-finder,http-auth-finder,http-apache-server-status,http-ls,http-mcmp,http-mobileversion-checker,http-robtex-shared-ns,http-rfi-spider,http-vhosts,firewalk --traceroute $hosts -oX $report_path$hosts/$output.xml 2> /dev/null
 	xml2html $hosts $output
-	nmap_interface
+	active_recon_nmap_interface
 	}
 	
 
@@ -438,10 +522,10 @@ function nmap_aio_cve_module {
 	echo -e "What is your host? e.g. www.example.com  \c"
 	read hosts
 	mkdir -p $report_path$hosts 2> /dev/null
-	output="Nmap_Http_CVE_Scan_Report"
+	output="Nmap_Common_Http_CVE_Scan_Report"
 	nmap --script=http-vuln-cve2006-3392,http-vuln-cve2009-3960,http-vuln-cve2010-0738,http-vuln-cve2010-2861,http-vuln-cve2011-3192,http-vuln-cve2011-3368,http-vuln-cve2012-1823,http-vuln-cve2013-0156,http-vuln-cve2013-6786,http-vuln-cve2013-7091,http-vuln-cve2014-2126,http-vuln-cve2014-2127,http-vuln-cve2014-2128,http-vuln-cve2014-2129,http-vuln-cve2014-3704,http-vuln-cve2014-8877,http-vuln-cve2015-1427,http-vuln-cve2015-1635,http-vuln-cve2017-5638 $hosts -oX $report_path$hosts/$output.xml 2> /dev/null
 	xml2html $hosts $output
-	nmap_interface
+	active_recon_nmap_interface
 	}
 
 	
@@ -454,33 +538,8 @@ function nmap_aio_ssl_module {
 	output="Nmap_Http_SSL_Scan_Report"
 	nmap -sV -sC --version-light -p $port --script=ssl-cert-intaddr,ssl-ccs-injection,ssl-dh-params,ssl-heartbleed,ssl-known-key,ssl-poodle,sslv2-drown $hosts -oX $report_path$hosts/$output.xml 2> /dev/null
 	xml2html $hosts $output
-	nmap_interface
+	active_recon_nmap_interface
 	}
-
-	
-function nmap_smb_module {
-	echo -e "What is your host? e.g. www.example.com  \c"
-	read hosts
-	mkdir -p $report_path$hosts 2> /dev/null
-	output="Nmap_SMB_Scan_Report"
-	nmap -p 445 --script=smb-vuln-ms07-029,smb-vuln-ms08-067,smb-vuln-ms10-054,smb-vuln-regsvc-dos,smb-vuln-conficker,smb-vuln-ms06-025,smb-vuln-cve2009-3103 $hosts -oX $report_path$hosts/$output.xml 2> /dev/null
-	xml2html $hosts $output
-	nmap_interface
-	}
-
-	
-function nmap_ftp_module {
-	echo -e "What is your host? e.g. www.example.com  \c"
-	read hosts
-	echo -e "What is your ftp port? (e.g. 21) \c"
-	read port
-	mkdir -p $report_path$hosts 2> /dev/null
-	output="Nmap_ftp_Scan_Report"
-	nmap -p $port -sV -sC --script=ftp-libopie,ftp-proftpd-backdoor,ftp-vsftpd-backdoor,ftp-vuln-cve2010-4221 $hosts -oX $report_path$hosts/$output.xml 2> /dev/null
-	xml2html $hosts $output
-	nmap_interface
-	}
-
 	
 function nmap_email_enumerator_module {
 	echo -e "What is your host? e.g. www.example.com  \c"
@@ -491,128 +550,285 @@ function nmap_email_enumerator_module {
 	output="Nmap_email_enumerator_Report"
 	nmap -p $port $hosts --script http-grep --script-args='match="[A-Za-z0-9%.%%%+%-]+@[A-Za-z0-9%.%%%+%-]+%.%w%w%w?%w?",breakonmatch' -oX $report_path$hosts/$output.xml 2> /dev/null
 	xml2html $hosts $output
-	nmap_interface
+	active_recon_nmap_interface
+	}
+
+
+
+#################################################Common Port
+
+# 1  : FTP (Normally Port 21)
+	# 2  : IMAP (Normally Port 143)
+	# 3  : MSSQL (Normally Port 1433)
+	# 4  : MYSQL (Normally Port 3306)
+	# 5  : NetBios (Normally Port 137) (For internal pentest)
+	# 6  : POP3 (Normally Port 110)
+	# 7  : SMB (Normally Port 445)
+	# 8  : SMTP (Normally Port 445,465,587)
+	# 9  : SNMP (Normally UDP Port 161) --BETA--
+	# 10 : SSH (Normally Port 22)
+	# 11 : Telnet (Normally Port 23)
+	# 12 : TFTP (Normally Port 69)
+	# 13 : VMWARE
+	# 14 : VNC (Normally Port 5900)
+
+function common_port_ftp_module {
+	echo -e "What is your host? e.g. www.example.com  \c"
+	read hosts
+	echo -e "What is your FTP port (Default : 21)? \c"
+	read port
+	new_path="$report_path$hosts/$port_analysis_path"
+	mkdir -p $new_path 2> /dev/null
+	output="FTP_analysis_Report"
+	#nmap -sV -sC --script firewall-bypass,ftp-brute,ftp-libopie,ftp-proftpd-backdoor,ftp-vsftpd-backdoor,ftp-vuln-cve2010-4221 -p $port --script-args firewall-bypass.helper="ftp"  $hosts -oX $new_path$output.xml 2> /dev/null
+	nmap -sV -sC --script firewall-bypass,ftp-libopie,ftp-proftpd-backdoor,ftp-vsftpd-backdoor,ftp-vuln-cve2010-4221 -p $port --script-args firewall-bypass.helper="ftp"  $hosts -oX $new_path$output.xml 2> /dev/null
+	xml2html $hosts/$port_analysis_path $output
+	active_recon_common_port_interface
+	}
+
+function common_port_imap_module {
+	echo -e "What is your host? e.g. www.example.com  \c"
+	read hosts
+	echo -e "What is your IMAP port (Default : 143)? \c"
+	read port
+	new_path="$report_path$hosts/$port_analysis_path"
+	mkdir -p $new_path 2> /dev/null
+	output="IMAP_analysis_Report"
+	nmap --script imap-ntlm-info -p $port $hosts -oX $new_path$output.xml 2> /dev/null
+	xml2html $hosts/$port_analysis_path $output
+	active_recon_common_port_interface
+	}	
+
+function common_port_mssql_module {
+	echo -e "What is your host? e.g. www.example.com  \c"
+	read hosts
+	echo -e "What is your MSSQL port (Default : 1433)? \c"
+	read port
+	new_path="$report_path$hosts/$port_analysis_path"
+	mkdir -p $new_path 2> /dev/null
+	output="MSSQL_analysis_Report"
+	nmap -p $port --script ms-sql-info,broadcast-ms-sql-discover,ms-sql-ntlm-info,ms-sql-xp-cmdshell,ms-sql-dump-hashes,ms-sql-empty-password --script-args mssql.instance-all $hosts -oX $new_path$output.xml 2> /dev/null 
+	xml2html $hosts/$port_analysis_path $output
+	active_recon_common_port_interface
+	}	
+
+function common_port_mysql_module {
+	echo -e "What is your host? e.g. www.example.com  \c"
+	read hosts
+	echo -e "What is your MYSQL port (Default : 3306)? \c"
+	read port
+	new_path="$report_path$hosts/$port_analysis_path"
+	mkdir -p $new_path 2> /dev/null
+	output="MYSQL_analysis_Report"
+	#nmap -sV -sC  -p $port --script=mysql-enum,mysql-brute,mysql-empty-password,mysql-users,mysql-databases,mysql-vuln-cve2012-2122 $hosts -oX $new_path$output.xml 2> /dev/null 
+	nmap -sV -sC  -p $port --script=mysql-enum,mysql-empty-password,mysql-users,mysql-databases,mysql-vuln-cve2012-2122 $hosts -oX $new_path$output.xml 2> /dev/null 
+	xml2html $hosts/$port_analysis_path $output
+	active_recon_common_port_interface
+	}	
+
+
+function common_port_netbios_module {
+	echo -e "What is your internal ip? e.g. 192.168.0.1  \c"
+	read hosts
+	echo -e "What is prefix? e.g. /24  \c"
+	read prefix
+	new_path="$report_path$hosts/$port_analysis_path"
+	mkdir -p $new_path 2> /dev/null
+	output="Netbios_analysis_Report"
+	nbtscan $hosts$prefix > $new_path/$output.txt
+	leafpad $new_path/$output.txt &
+	active_recon_common_port_interface
+	}	
+
+function common_port_pop3_module {
+	echo -e "What is your host? e.g. www.example.com  \c"
+	read hosts
+	echo -e "What is your POP3 port (Default : 110)? \c"
+	read port
+	new_path="$report_path$hosts/$port_analysis_path"
+	mkdir -p $new_path 2> /dev/null
+	output="POP3_analysis_Report"
+	nmap -sV -sC --script pop3-ntlm-info -p $port $hosts -oX $new_path$output.xml 2> /dev/null
+	xml2html $hosts/$port_analysis_path $output
+	active_recon_common_port_interface
+	}
+	
+function common_port_smb_module {
+	echo -e "What is your host? e.g. www.example.com  \c"
+	read hosts
+	echo -e "What is your SMB port (Default : 445)? \c"
+	read port
+	new_path="$report_path$hosts/$port_analysis_path"
+	mkdir -p $new_path 2> /dev/null
+	output="SMB_analysis_Report"
+	nmap -A -sV -Pn -T4 -p $port --script=smb-os-discovery,smb-server-stats,smb-ls,smb-enum-domains,smbv2-enabled,smb-psexec,smb-enum-groups,smb-enum-processes,smb-brute,smb-print-text,smb-security-mode,smb-enum-sessions,smb-mbenum,smb-enum-users,smb-enum-shares,smb-system-info,smb-vuln-ms10-054,smb-vuln-ms10-061 $hosts -oX $new_path$output.xml 2> /dev/null
+	xml2html $hosts/$port_analysis_path $output
+	active_recon_common_port_interface
 	}
 
 	
-function metagofil_module {
+function common_port_smtp_module {
 	echo -e "What is your host? e.g. www.example.com  \c"
 	read hosts
-	echo -e "Enter filetype separated by comma (e.g:- pdf, doc, xls,ppt,etc): \c"
-	read files
-	mkdir -p $report_path$hosts/files 2> /dev/null
-	output="File_and_metadata_Report"
-	python $application_path$metagoofil_folder/metagoofil.py -d $hosts -t $files -l 500 -n 1000 -o $report_path$hosts/files -f $report_path$hosts/$output.html
-	x-www-browser $report_path$hosts/$output.html 2> /dev/null &
-	recon
+	echo -e "What is your SMB port (Default : 25,465,587)? \c"
+	read port
+	new_path="$report_path$hosts/$port_analysis_path"
+	mkdir -p $new_path 2> /dev/null
+	output="SMTP_analysis_Report"
+	xterm -e "service postgresql start;"
+	smtp-user-enum -M VRFY -U /usr/share/brutex/wordlists/simple-users.txt -t $hosts   | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g" | sed "s/\x0f//g" |& tee -a  $new_path$output.txt;
+	echo "" >> $new_path$output.txt;echo "" >> $new_path$output.txt;echo "" >> $new_path$output.txt;
+	msfconsole -x "use scanner/smtp/smtp_enum; setg RHOSTS "$hosts"; setg RHOST "$hosts"; setg RPORT "$port"; run;use auxiliary/scanner/smtp/smtp_relay; setg EXTENDED true; run; exit;"  | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g" | sed "s/\x0f//g" |& tee -a  $new_path$output.txt; 
+	x-www-browser $new_path$output.txt 2> /dev/null &
+	active_recon_common_port_interface
 	}
 
 	
-function sniper_module {
+function common_port_snmp_module {
 	echo -e "What is your host? e.g. www.example.com  \c"
 	read hosts
+	echo -e "What is your snmp port (Default : 161)? \c"
+	read port
+	new_path="$report_path$hosts/$port_analysis_path"
+	mkdir -p $new_path 2> /dev/null
+	output="SNMP_analysis_Report"
+	nmap -sU -p $port --script=snmp-interfaces,snmp-netstat,snmp-brute,snmp-sysdescr,snmp-win32-services,snmp-win32-shares,snmp-win32-software,snmp-win32-users $hosts -oX $new_path$output.xml 2> /dev/null
+	xml2html $hosts/$port_analysis_path $output
+	active_recon_common_port_interface
+	}
 	
-	#echo -e "On Port? e.g. 80  \c"
-	#read ports
-	echo -e "Do a passive (Stealth) scan? (y/n) \c"
-	read  choice
+function common_port_ssh_module {
+	echo -e "What is your host? e.g. www.example.com  \c"
+	read hosts
+	echo -e "What is your SSH port (Default : 22)? \c"
+	read port
+	new_path="$report_path$hosts/$port_analysis_path"
+	mkdir -p $new_path 2> /dev/null
+	output="SSH_analysis_Report"
+	nmap -sV -sC -p $port --script ssh2-enum-algos $hosts -oX $new_path$output.xml 2> /dev/null
+	xml2html $hosts/$port_analysis_path $output
+	active_recon_common_port_interface
+	}
+
 	
-	if [ $choice != "y" ]
-	then
-	  #If not yes, use web scan
-	  scan_mode="web"
-	else
-	  #Use stealth scan
-	  scan_mode="stealth"
-	fi
+function common_port_telnet_module {
+	echo -e "What is your host? e.g. www.example.com  \c"
+	read hosts
+	echo -e "What is your Telnet port (Default : 23)? \c"
+	read port
+	new_path="$report_path$hosts/$port_analysis_path"
+	mkdir -p $new_path 2> /dev/null
+	output="Telnet_analysis_Report"
+	output2="Telnet_analysis_Report_II"	
+	xterm -e "service postgresql start;"
+	nmap -sV -sC -p $port --script telnet-ntlm-info $hosts -oX $new_path$output.xml 2> /dev/null
+	cisco-torch -A $hosts | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g" | sed "s/\x0f//g" |& tee -a  $new_path$output2.txt;
+	echo "" >> $new_path$output2.txt;echo "" >> $new_path$output2.txt;echo "" >> $new_path$output2.txt;
+	msfconsole -x "use scanner/telnet/lantronix_telnet_password; setg RHOSTS "$hosts"; setg RHOST "$hosts"; run; use scanner/telnet/lantronix_telnet_version; run; use scanner/telnet/telnet_encrypt_overflow; run; use scanner/telnet/telnet_ruggedcom; run; use scanner/telnet/telnet_version; run; exit;"    | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g" | sed "s/\x0f//g" |& tee -a  $new_path$output2.txt;
+	xml2html $hosts/$port_analysis_path $output
+	x-www-browser $new_path$output2.txt 2> /dev/null &
+	active_recon_common_port_interface
+	}
 	
+
+function active_recon_dns {
+	echo -e "What is your host? e.g. www.example.com  \c"
+	read hosts
 	mkdir -p $report_path$hosts 2> /dev/null
-	output="Sniper_Output"
-	xterm -e "sniper $hosts $scan_mode |& tee -a $report_path$hosts/$output.txt && xdg-open $report_path$hosts/$output.txt 2> /dev/null" &
-	recon
+	output="DNS_Report"
+	dnsrecon -d $hosts >> $report_path$hosts/$output.txt;
+	echo "================================================================" >> $report_path$hosts/$output.txt;
+	dnsrecon -d $hosts -t axfr >> $report_path$hosts/$output.txt;
+	echo "================================================================" >> $report_path$hosts/$output.txt;
+	dnsrecon -d $hosts -t zonewalk >> $report_path$hosts/$output.txt;
+	x-www-browser $report_path$hosts/$output.txt 2> /dev/null &
+	active_recon_interface
 	}
-	
-	
-function brute_dir_module {
-	echo -e "Http or Https? \c"
-	read protocols
-	echo -e "What is your host? e.g. www.example.com  \c"
-	read hosts
-	wordlist
-	echo -e "Use wordlist path:  \c"
-	read use_word_list
-	output="Web_Directory_Bruteforce_Report"
-	mkdir -p $report_path$hosts 2> /dev/null
-	#wfuzz -c -z file,/usr/share/wordlists/fasttrack.txt --hc 404,301 -o html http://example.com/FUZZ > output.html
-	#xterm -e "wfuzz -c -z file,$use_word_list --hc 404 -o html $protocols://$hosts/FUZZ |& tee $report_path$hosts/$output.html ; x-www-browser $report_path$hosts/$output.html 2> /dev/null" &
-	xterm -e "dirb $protocols://$hosts/ $use_word_list  -o $report_path$hosts/$output.txt && $report_path$hosts/$output.txt 2> /dev/null" &
-	recon
-	}
-	
 
-function nikto_module {
+	
+function active_recon_nikto_module {
 	echo -e "Http or Https? \c"
 	read protocols
 	echo -e "What is your host? e.g. www.example.com  \c"
 	read hosts
 	output="Nikto_Report"
-	rm -f $output.html
+	rm -f $report_path$hosts/$output.html
+	mkdir -p $report_path$hosts 2> /dev/null
+	echo ""
 	nikto -h $protocols://$hosts -F htm -output $output.html
 	mv $output.html $report_path$hosts/$output.html
 	x-www-browser $report_path$hosts/$output.html 2> /dev/null &
-	recon
+	active_recon_interface
+	}
+
+	
+function active_recon_load_balancer_module {
+	echo -e "What is your host? e.g. www.example.com  \c"
+	read hosts
+	output="Load_balancer_report"
+	mkdir -p $report_path$hosts 2> /dev/null
+	echo ""
+	lbd $hosts |& tee -a $report_path$hosts/$output.txt;
+	x-www-browser $report_path$hosts/$output.txt 2> /dev/null &
+	active_recon_interface
 	}
 	
+
+function active_recon_wafw00f_module {
+	echo -e "What is your host? e.g. www.example.com  \c"
+	read hosts
+	output="WAF_report"
+	mkdir -p $report_path$hosts 2> /dev/null
+	echo ""
+	wafw00f $hosts |& tee -a $report_path$hosts/$output.txt;
+	x-www-browser $report_path$hosts/$output.txt 2> /dev/null &
+	active_recon_interface
+	}
+
 	
-function wig_module {
+function active_cms_identifier_module {
+	echo -e "What is your host? e.g. www.example.com  \c"
+	read hosts
+	output="Site_Engine_Identifier_Report"
+	mkdir -p $report_path$hosts 2> /dev/null
+	echo ""
+	whatweb -a 3 -v $hosts | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g" | sed "s/\x0f//g" |& tee -a  $report_path$hosts/$output.txt;
+	x-www-browser $report_path$hosts/$output.txt 2> /dev/null &
+	active_recon_interface
+	}	
+
+	
+function active_web_crawler_module {
 	echo -e "Http or Https? \c"
 	read protocols
 	echo -e "What is your host? e.g. www.example.com  \c"
 	read hosts
-	output="CMS_Identifier_Report"
+	echo -e "Got Cookies? [y/n] \c"
+	read auth_cookies
+	
+	case "$auth_cookies" in
+	"y")
+		echo -e "Insert The Cookie Values \c"
+		read cookies_value
+		the_cookies="-C name=$cookies_value"
+		;;
+	*)
+		the_cookies=""
+		;;
+	esac
+	
+	echo -e "How deep you want to crawl? e.g. (Max:16)  \c"
+	read depth
+	output="Web_Crawler"
 	mkdir -p $report_path$hosts 2> /dev/null
-	#./Application/wig/wig.py http://localhost:9292  &>> Report/localhost/CMS_Identifier_Report.txt
-	echo  -e $OKRED & echo -e "Scanning...This process might take same time, please wait..$RESET" & echo
-	./$application_path$wig_folder/wig.py $protocols://$hosts  |& tee $report_path$hosts/$output.txt &
-	wait
-	xdg-open $report_path$hosts/$output.txt 2> /dev/null &
-	recon
-	}	
-
-
-function theHarvester_module {
-	echo -e "What is your host? e.g. www.example.com  \c"
-	read hosts
-	output="Email_Domain_Harvest_Report"
-	mkdir -p $report_path$hosts 2> /dev/null
-	xterm -e "python $application_path$theHarvester_folder/theHarvester.py -d $hosts -l 500 -b all -h email_harvest.html" &
-	#python $application_path$theHarvester_folder/theHarvester.py -d $hosts -l 500 -b all -h email_harvest.html |& tee $report_path$hosts/$output.txt
-	recon
-	}	
-	
-	
-function maltego_module {
-	xterm -hold -e 'maltegoce' &
-	recon
+	echo ""
+	skipfish -d $depth $the_cookies -o $report_path$hosts/$output $protocols://$hosts;
+	x-www-browser $report_path$hosts/$output/index.html 2> /dev/null &
+	active_recon_interface
 	}
 
 	
-function reconng_module {
-	echo -e '#!/bin/sh\n recon-ng' > $application_path/reconng.sh
-	chmod +x $application_path/reconng.sh
-	gnome-terminal -x $application_path/reconng.sh &
-	recon
-	}
-	
-	
-function maltego_module {
-	xterm -e 'maltegoce' &
-	wait
-	recon
-	}
-	
-	
-function http_method_module {
+function active_http_method_module {
 	response='y'  
 	while [ ${response:0:1} != n ]  
 	do  
@@ -621,7 +837,7 @@ function http_method_module {
 		echo
 		#echo -e "Enter Link to test (e.g: www.example.com)  \c"
 		#read links
-		echo -e "Please give name for output file:  \c"
+		echo -e "Enter Link to test (e.g: www.example.com)  \c"
 		read hosts
 		mkdir -p $report_path$hosts 2> /dev/null
 		echo -e "Please provide list of URL to be checked [PATH]:  \c"
@@ -642,254 +858,39 @@ function http_method_module {
 		[[ ${#response} -eq 0 ]] && response='y'  
 	done 	
 	xdg-open $report_path$hosts/$output.txt 2> /dev/null &
-	recon
+	active_recon_interface
 	}	
 
-
-function google_dork_module {
-	echo -e "$OKRED"
-	echo -e "This module open lots of tab. Is it ok? [y/n] \c"
-	read actions
-	echo -e "$RESET"
-	case "$actions" in
-	"y")
-		
-	echo -e "What is your host? e.g www.example.com  \c"
-	read hosts
-
-	declare -a dorks=(" -url https://www.google.com/search?q=site:$hosts+intitle:index.of"
-					" -url https://www.google.com/search?q=site:$hosts+ext:xml+|+ext:conf+|+ext:cnf+|+ext:reg+|+ext:inf+|+ext:rdp+|+ext:cfg+|+ext:txt+|+ext:ora+|+ext:ini+|+ext:sql+|+ext:dbf+|+ext:mdb+|+ext:log+|+ext:bkf+|+ext:bkp+|+ext:bak+|+ext:old+|+ext:backup"
-					" -url https://www.google.com/search?q=site:$hosts+inurl:login"
-					" -url https://www.google.com/search?q=site:$hosts+ext:doc+|+ext:docx+|+ext:odt+|+ext:pdf+|+ext:rtf+|+ext:sxw+|+ext:psw+|+ext:ppt+|+ext:pptx+|+ext:pps+|+ext:csv"
-					" -url https://www.google.com/search?q=site:$hosts+ext:action+OR+struts"
-					" -url https://www.google.com/search?q=site:$hosts+inurl:redir+OR+inurl:url+OR+inurl:redirect+OR+inurl:return+OR+inurl:src=http+OR+inurl:r=http"
-					" -url https://www.google.com/search?q=site:$hosts+inurl:wp-+OR+inurl:plugin+OR+inurl:upload+OR+inurl:download"
-					" -url https://www.google.com/search?q=site:$hosts+inurl:readme+OR+inurl:license+OR+inurl:install+OR+inurl:setup+OR+inurl:config"
-					" -url https://www.google.com/search?q=site:$hosts+inurl:shell+OR+inurl:backdoor+OR+inurl:wso+OR+inurl:cmd+OR+shadow+OR+passwd+OR+boot.ini+OR+inurl:backdoor"
-					" -url https://www.google.com/search?q=site:$hosts+username+OR+password+OR+login+OR+root+OR+admin"
-					" -url https://www.google.com/search?q=site:linkedin.com+employees+$hosts"
-					" -url https://www.google.com/search?q=site:$hosts+ext:php+intitle:phpinfo+%22published+by+the+PHP+Group%22"
-					" -url https://www.google.com/search?q=site:$hosts+intext:%22sql+syntax+near%22+|+intext:%22syntax+error+has+occurred%22+|+intext:%22incorrect+syntax+near%22+|+intext:%22unexpected+end+of+SQL+command%22+|+intext:%22Warning:+mysql_connect()%22+|+intext:%22Warning:+mysql_query()%22+|+intext:%22Warning:+pg_connect()%22"
-					" -url https://securityheaders.io/?q=$hosts"
-					" -url https://www.openbugbounty.org/search/?search=$hosts&type=host"
-					" -url https://crt.sh/?q=$hosts"
-					" -url https://www.tcpiputils.com/browse/domain/$hosts"
-					" -url http://toolbar.netcraft.com/site_report?url=$hosts"
-					" -url https://www.shodan.io/search?query=$hosts"
-					" -url https://www.ssllabs.com/ssltest/analyze.html?d=$host"
-					" -url https://www.censys.io/ipv4?q=$hosts"
-					" -url https://www.builtwith.com/$hosts")
-					
-		x-www-browser --new-tab ${dorks[@]} 2> /dev/null &
-		
-		recon
-		;;
-	*)
-		recon
-		;;
-	esac
-	}
 	
-
-#     _____                       _               __  __           _       _      
-#    / ____|                     (_)             |  \/  |         | |     | |     
-#   | (___   ___ __ _ _ __  _ __  _ _ __   __ _  | \  / | ___   __| |_   _| | ___ 
-#    \___ \ / __/ _` | '_ \| '_ \| | '_ \ / _` | | |\/| |/ _ \ / _` | | | | |/ _ \
-#    ____) | (_| (_| | | | | | | | | | | | (_| | | |  | | (_) | (_| | |_| | |  __/
-#   |_____/ \___\__,_|_| |_|_| |_|_|_| |_|\__, | |_|  |_|\___/ \__,_|\__,_|_|\___|
-#                                          __/ |                                  
-#                                         |___/                                   
-
-function arachni_module {
-	xterm -hold -e 'echo -e "Admin Account	:--- user: admin@admin.admin	pass: administrator" &
-	echo -e "User Account	:--- user: user@user.user	pass: regular_user" &
-	./Application/arachni/bin/arachni_web' &
-	sleep 25
-	x-www-browser http://localhost:9292 &
-	va_scanning
-	}
-
-	
-function open_vas_module {
-	xterm -hold -e 'echo -e "User Account	user: admin	pass: admin" && 
-	echo -e "echo -e "In case of any error, please run '"openvas-setup"' commmand""
-	openvas-start &&
-	openvasmd --create-user admin;
-	openvasmd --user=admin --new-password=admin' &
-	#openvas-start
-	#openvas-stop
-	sleep 25
-	x-www-browser https://127.0.0.1:9392 &
-	va_scanning
-	}
-
-	
-function burpsuite_module {
-	xterm -hold -e 'echo "
-	DONT CLOSE THIS WINDOW!
-	Please set proxy to 127.0.0.1:8080 and enable intercept mode" & 
-	echo &
-	burpsuite'&
-	sleep 25
-	x-www-browser &
-	va_scanning
-	}
-
-	
-function nessus_module {
-	xterm -hold -e 'echo "For 1st time login:
-    1. Register account
-    2. Enter licence, register from here : https://www.tenable.com/register" && 
-	/etc/init.d/nessusd start' &
-	sleep 25
-	x-www-browser https://kali:8834/ &
-	va_scanning
-	}
-
-
-function wpscan_module {
-	
+function active_brute_dir_module {
+	echo -e "Http or Https? \c"
+	read protocols
 	echo -e "What is your host? e.g. www.example.com  \c"
 	read hosts
-	
-	echo -e "$OKGREEN
+	wordlist
+	echo -e "Use wordlist path:  \c"
+	read use_word_list
+	mkdir -p $report_path$hosts 2> /dev/null
+	echo -e "Bruteforce directory or file? [dir/file]  \c"
+	read responses
 
-	Scan Wordpress using:
-	
-	1 : Non Intrusive Scane
-	2 : Enumerate User
-	3 : Enumerate Plugins
-	4 : Enumerate Themes
-	
-	99: Exit
-	$RESET"
-	
-	echo -e "Your choice is? \c"
-	read  choice
-	
-	case "$choice" in
-	"1")
-		xterm -hold -e "wpscan --url $hosts" &
-		CMS_Interface
-		;;
-	"2")
-		xterm -hold -e "wpscan --url $hosts --enumerate u" &
-		CMS_Interface
-		;;
-	"3")
-		xterm -hold -e "wpscan --url $hosts --enumerate p" &
-		CMS_Interface
-		;;
-	"4")
-		xterm -hold -e "wpscan --url $hosts --enumerate t" &
-		CMS_Interface
-		;;
-	"1")
-		xterm -hold -e "wpscan --url $hosts" &
-		CMS_Interface
+	case "$responses" in
+	"file")
+		output="Web_Files_Bruteforce_Report"
+		echo -e "File Type?: e.g. [php,html,asp,others..] \c"
+		read file_type
+		xterm -e "dirb $protocols://$hosts/ -X .$file_type $use_word_list  -o $report_path$hosts/$output.txt && $report_path$hosts/$output.txt 2> /dev/null ; x-www-browser $report_path$hosts/$output.txt 2> /dev/null" &
+		active_recon_interface
 		;;
 	*)
-		echo "Bye Bye~"
-		exit
+		output="Web_Directory_Bruteforce_Report"
+		xterm -e "dirb $protocols://$hosts/ $use_word_list  -o $report_path$hosts/$output.txt && $report_path$hosts/$output.txt 2> /dev/null ; x-www-browser $report_path$hosts/$output.txt 2> /dev/null" &
+		active_recon_interface
 		;;
 	esac
-	
 	}
 	
-	
-function joomlavs_module {
-	echo -e "What is your host? e.g www.example.com  \c"
-	read hosts	
-	xterm -hold -e "./$application_path$joomlavs_folder/joomlavs.rb -u $hosts --scan-all" &
-	CMS_Interface
-	}
-	
-	
-function droopescan_module {
-	echo -e "What is your host? e.g www.example.com  \c"
-	read hosts
-	xterm -hold -e "./$application_path$droopescan_folder/droopescan scan drupal -u $hosts -t 8" &
-	CMS_Interface
-	}
-	
-	
-function liferayscan_module {
-	echo -e "What is your Protocol? e.g [http/https]  \c"
-	read protocols
-	echo -e "What is your host? e.g [www.example.com]  \c"
-	read hosts
-	xterm -hold -e "./$application_path$liferayscan_folder/LiferayScan -u $protocols://$hosts" &
-	CMS_Interface
-	}
-
-	
-#    ______            _       _ _     __  __           _       _      
-#   |  ____|          | |     (_) |   |  \/  |         | |     | |     
-#   | |__  __  ___ __ | | ___  _| |_  | \  / | ___   __| |_   _| | ___ 
-#   |  __| \ \/ / '_ \| |/ _ \| | __| | |\/| |/ _ \ / _` | | | | |/ _ \
-#   | |____ >  <| |_) | | (_) | | |_  | |  | | (_) | (_| | |_| | |  __/
-#   |______/_/\_\ .__/|_|\___/|_|\__| |_|  |_|\___/ \__,_|\__,_|_|\___|
-#               | |                                                    
-#               |_|                                                    
-
-
-function fatrat_module {
-	gnome-terminal -e "fatrat" &
-	exploit_interface
-	}
-
-	
-
-
-#    _______          _   __  __           _       _      
-#   |__   __|        | | |  \/  |         | |     | |     
-#      | | ___   ___ | | | \  / | ___   __| |_   _| | ___ 
-#      | |/ _ \ / _ \| | | |\/| |/ _ \ / _` | | | | |/ _ \
-#      | | (_) | (_) | | | |  | | (_) | (_| | |_| | |  __/
-#      |_|\___/ \___/|_| |_|  |_|\___/ \__,_|\__,_|_|\___|
-#                                                         
-#                                                         
-
-
-	
-function mantra_module {
-	xterm -e "owasp-mantra-ff" &
-	tool_interface
-}
-
-
-function cupp_module {
-	echo -e "$OKRED"
-	echo -e "Select from the menu:
-
-1 : Generate Wordlist
-2 : Download Wordlist $RESET
-	"
-	read actions
-	case "$actions" in
-	"1")
-		cd $application_path$cupp_folder
-		python cupp.py -i
-		
-		cd $default_directory
-		xdg-open $application_path$cupp_folder
-		tool_interface
-		;;
-	"2")
-		cd $application_path$cupp_folder
-		python cupp.py -l
-		cd $default_directory
-		xdg-open $application_path$cupp_folder/dictionaries
-		tool_interface
-		;;
-	*)
-		tool_interface
-		;;
-	esac
-}
-
-
-	
+########################################################################################################################################################
 #    _____       _             __               
 #   |_   _|     | |           / _|              
 #     | |  _ __ | |_ ___ _ __| |_ __ _  ___ ___ 
@@ -899,7 +900,7 @@ function cupp_module {
 #                                               
 #                                               
 
-# Main Logo
+# Main Logo--------------------------------------------------------------------------------------------------------
 function main_logo {
 	clear && echo -en "\e[3J"
 	echo ""
@@ -911,8 +912,7 @@ function main_logo {
 	echo -e "$OKRED╚══════╝ ╚═╝╚═╝     ╚═╝╚═╝     ╚══════╝╚═════╝ $app_version$RESET"
 	}
 
-
-# Landing Page Interface
+# Main Function --------------------------------------------------------------------------------------------------------
 function init {
 	main_logo
 	echo -e "$OKGREEN
@@ -923,12 +923,10 @@ function init {
 
 Select from the menu:
 	
-	1 : Reconnaisance
-	2 : Vulnerability Scanning
-	3 : Exploit
-	4 : Post Exploit
-	5 : Forensic - $OKRED TODO $RESET $OKGREEN
-	6 : Tools
+	1 : Passive Reconnaisance
+	2 : Active Reconnaisance
+	3 : Vulnerability Scanning
+	4 : Search for Common Exploit
 	9 : Update $SELF script
 	
 	99: Exit
@@ -939,22 +937,16 @@ Select from the menu:
 	
 	case "$choice" in
 	"1")
-		recon
+		passive_recon_interface
 		;;
 	"2")
-		va_scanning
+		active_recon_interface
 		;;
 	"3")
-		exploit_interface
+		va_scan
 		;;
 	"4")
-		init
-		;;
-	"5")
-		init
-		;;
-	"6")
-		tool_interface
+		search_common_exploit
 		;;
 	"9")
 		runSelfUpdate
@@ -964,11 +956,13 @@ Select from the menu:
 		exit
 		;;
 	esac
+	
+	if [ -z $DISABLE_POSTGRESQL ]; then service postgresql start; fi
 	}
 
 
-# Reconnaisance Interface
-function recon {
+# Passive Reconnaisance Interface--------------------------------------------------------------------------------------------------------
+function passive_recon_interface {
 	main_logo
 	echo -e "$OKGREEN
 [+]       Coded BY Muzaffar Mohamed       [+] 
@@ -976,20 +970,15 @@ function recon {
 [-]       	    Local IP:         	  [-]$RESET $OKORANGE
 [-]             $ip_local      	  [-]$RESET $OKGREEN  
 
-Select from the 'Reconnaisance' menu:
+Select from the 'Passive Reconnaisance' menu:
 	
-	1  : Nmap - $OKORANGE Port Scanner $RESET $OKGREEN
-	2  : Sn1per - $OKORANGE All-in-one Enumerator $RESET $OKGREEN
-	3  : Nikto - $OKORANGE Server Configuration Scanner $RESET $OKGREEN
-	4  : Wig - $OKORANGE CMS Identifier $RESET $OKGREEN
-	5  : Burpsuite_module - $OKORANGE Active/Passive Website Crawler $RESET $OKGREEN
-	6  : Dirb - $OKORANGE Hidden Web Directory Bruteforcer $RESET $OKGREEN
-	7  : Metagoofil - $OKORANGE Information gathering tool $RESET $OKGREEN
-	8  : HTTP Method Analyzer - $OKORANGE Http Method Analyzer $RESET $OKGREEN
-	9  : Google Dork - $OKORANGE Information from Google / Informative site $RESET $OKGREEN
-	10 : theHarvester - $OKORANGE Email,Domain and Virtual Server enumerator  $RESET $OKGREEN
-	12 : Maltego - $OKORANGE Reconnaissance framework $RESET $OKGREEN
-	13 : Recon-Ng - $OKORANGE Web Reconnaissance framework $RESET $OKGREEN
+	1  : Whois - $OKORANGE Whois Information $RESET $OKGREEN
+	2  : Google Dork - $OKORANGE Information from Google $RESET $OKGREEN
+	3  : AIO Site Information - $OKORANGE Informative site $RESET $OKGREEN
+	4  : DNSDumpster - $OKORANGE Dns Recon & Research, Find & Lookup DNS Records $RESET $OKGREEN
+	5  : Online Tools - $OKORANGE Free Online Recon and VA Tools $RESET $OKGREEN
+	6  : theHarvester - $OKORANGE Email,Domain and Virtual Server enumerator  $RESET $OKGREEN
+	7  : Banzai! - $OKORANGE Common Basic Passive Enumeration!  $RESET $OKGREEN
 	
 	99 : Return		
 	$RESET"
@@ -1000,40 +989,26 @@ Select from the 'Reconnaisance' menu:
 	
 	case "$choice" in
 	"1")
-		nmap_interface
+		pa_whois
 		;;
 	"2")
-		sniper_module
+		pa_google_dork
 		;;
 	"3")
-		nikto_module
+		pa_aio_site
 		;;
 	"4")
-		wig_module
+		pa_online_tools $pa_dnsdumpster_url
+		passive_recon_interface
 		;;
 	"5")
-		burpsuite_module
+		passive_recon_online_tools_interface
 		;;
 	"6")
-		brute_dir_module
+		pa_harvester
 		;;
 	"7")
-		metagofil_module
-		;;
-	"8")
-		http_method_module
-		;;
-	"9")
-		google_dork_module
-		;;
-	"10")
-		theHarvester_module
-		;;
-	"12")
-		maltego_module
-		;;
-	"13")
-		reconng_module
+		pa_basic
 		;;
 	*)
 		#echo "Huhhh! Wrong input!"
@@ -1043,8 +1018,148 @@ Select from the 'Reconnaisance' menu:
 	}
 
 
-#Nmap Interface	
-function nmap_interface {
+# Passive Recon Online Tools Interface--------------------------------------------------------------------------------------------------------
+function passive_recon_online_tools_interface {
+	main_logo
+	echo -e "$OKGREEN
+[+]       Coded BY Muzaffar Mohamed       [+] 
+[-]           coco.oligococo.tk           [-]
+[-]       	    Local IP:         	  [-]$RESET $OKORANGE
+[-]             $ip_local      	  [-]$RESET $OKGREEN  
+
+Select from the 'Online Tools' menu:
+	
+	1  : Nmap - $OKORANGE Open Ports & Running Services Scanner $RESET $OKGREEN
+	2  : Hostmap - $OKORANGE Hostnames & Virtual Hosts Discovery Tool $RESET $OKGREEN
+	3  : Nikto - $OKORANGE Webserver VA Scanner $RESET $OKGREEN
+	4  : WhatWeb - $OKORANGE CMS Identifier $RESET $OKGREEN
+	5  : WPScan - $OKORANGE Wordpress VA Scanner $RESET $OKGREEN
+	6  : Droopescan - $OKORANGE Drupal & Silverstripe VA Scanner $RESET $OKGREEN	
+	7  : SQLMap - $OKORANGE Detecting SQL Injection Flaws $RESET $OKGREEN
+	8  : All-in-one Tools - $OKORANGE Requires Account $RESET $OKGREEN
+	
+	99 : Return		
+	$RESET"
+	
+	
+	echo -e "Holla! Your choice is? \c"
+	read  choice
+	
+	case "$choice" in
+	"1")
+		pa_online_tools $pa_nmap_url
+		passive_recon_online_tools_interface
+		;;
+	"2")
+		pa_online_tools $pa_hosmap_url
+		passive_recon_online_tools_interface
+		;;
+	"3")
+		pa_online_tools $pa_nikto_url
+		passive_recon_online_tools_interface
+		;;
+	"4")
+		pa_online_tools $pa_whatsweb_url
+		passive_recon_online_tools_interface
+		;;
+	"5")
+		pa_online_tools $pa_wpscan_url
+		passive_recon_online_tools_interface
+		;;
+	"6")
+		pa_online_tools $pa_droopescan_url
+		passive_recon_online_tools_interface
+		;;
+	"7")
+		pa_online_tools $pa_sqlmap_url
+		passive_recon_online_tools_interface
+		;;
+	"8")
+		pa_online_tools $pa_aio_url
+		passive_recon_online_tools_interface
+		;;
+	*)
+		#echo "Huhhh! Wrong input!"
+		init
+		;;
+	esac
+	}
+	
+	
+# Active Reconnaisance Interface--------------------------------------------------------------------------------------------------------
+function active_recon_interface {
+	main_logo
+	echo -e "$OKGREEN
+[+]       Coded BY Muzaffar Mohamed       [+] 
+[-]           coco.oligococo.tk           [-]
+[-]       	    Local IP:         	  [-]$RESET $OKORANGE
+[-]             $ip_local      	  [-]$RESET $OKGREEN  
+
+Select from the 'Reconnaisance' menu:
+	
+	1  : Nmap - $OKORANGE Port Scanner $RESET $OKGREEN
+	2  : DNS Reconnaisance - $OKORANGE Enumerate DNS Information $RESET $OKGREEN
+	3  : Nikto - $OKORANGE Simple Basic Web Server Scanner $RESET $OKGREEN
+	4  : WhatWeb - $OKORANGE Website Fingerprinter $RESET $OKGREEN
+	5  : LBD - $OKORANGE Load Balancer Detector $RESET $OKGREEN
+	6  : Wafw00f - $OKORANGE WAF Detector $RESET $OKGREEN
+	7  : Skipfish - $OKORANGE Web Crawler $RESET $OKGREEN
+	8  : HTTP Method Analyzer - $OKORANGE Http Method Analyzer $RESET $OKGREEN
+	9  : Dirb - $OKORANGE Hidden Web Directory Bruteforcer $RESET $OKGREEN
+	10 : Enumerate Common Port - $OKORANGE Active/Passive Website Crawler $RESET $OKGREEN
+	11 : Armitage - $OKORANGE GUI Based Metasploit $RESET $OKGREEN
+	
+	99 : Return		
+	$RESET"
+	
+	echo -e "Holla! Your choice is? \c"
+	read  choice
+	
+	case "$choice" in
+	"1")
+		active_recon_nmap_interface
+		;;
+	"2")
+		active_recon_dns
+		;;
+	"3")
+		active_recon_nikto_module
+		;;
+	"4")
+		active_cms_identifier_module
+		;;	
+	"5")
+		active_recon_load_balancer_module
+		;;
+	"6")
+		active_recon_wafw00f_module
+		;;
+	"7")
+		active_web_crawler_module
+		;;
+	"8")
+		active_http_method_module
+		;;
+	"9")
+		active_brute_dir_module
+		;;
+	"10")
+		active_recon_common_port_interface
+		;;
+	"11")
+		xterm -e "service postgresql start;armitage" &
+		active_recon_interface
+		;;
+	*)
+		#echo "Huhhh! Wrong input!"
+		init
+		;;
+	esac
+	}
+
+	
+# Active Recon Nmap Interface --------------------------------------------------------------------------------------------------------	
+function active_recon_nmap_interface {
 	main_logo
 	echo -e "$OKGREEN
 [+]       Coded BY Muzaffar Mohamed       [+] 
@@ -1054,14 +1169,13 @@ function nmap_interface {
 
 Select from the 'Nmap command' menu:
 	
-	1 : Normal Intense Scan
-	2 : UDP Scan
-	3 : All-in-one Web Enumeration
-	4 : All-in-one SSL Vulnerability Scan
-	5 : All-in-one Common Web Vulnerability Scan
-	6 : NMAP Email Enumerator
-	7 : Basic SMB Scanner (Port 445)
-	8 : Basic FTP Scanner (Port 21)
+	1 : Normal OS and Service Scan
+	2 : Stealth OS and Service Scan [Very Slow!]
+	3 : Normal UDP Scan
+	4 : All-in-one Web Enumeration Scan
+	5 : All-in-one SSL Vulnerability Scan
+	6 : All-in-one Common Web Vulnerability Scan
+	7 : NMAP Email Enumerator 
 	
 	99: Return	
 	$RESET"
@@ -1074,140 +1188,33 @@ Select from the 'Nmap command' menu:
 		nmap_module
 		;;
 	"2")
+		nmap_stealth_module
+		;;	
+	"3")
 		nmap_udp_module
 		;;
-	"3")
+	"4")
 		nmap_aio_enum_module
 		;;
-	"4")
+	"5")
 		nmap_aio_ssl_module
 		;;
-	"5")
+	"6")
 		nmap_aio_cve_module
 		;;
-	"6")
+	"7")
 		nmap_email_enumerator_module
 		;;
-	"7")
-		nmap_smb_module
-		;;
-	"8")
-		nmap_ftp_module
-		;;
-	"20")
-		nmap --script-updatedb
-		nmap_interface
-		;;
 	*)
 		#echo "Huhhh! Wrong input!"
-		recon
+		active_recon_interface
 		;;
 	esac
 }
 
 
-#Vulnerability Scanning Interface
-function va_scanning {
-	main_logo
-	echo -e "$OKGREEN
-[+]       Coded BY Muzaffar Mohamed       [+] 
-[-]           coco.oligococo.tk           [-]
-[-]       	    Local IP:         	  [-]$RESET $OKORANGE
-[-]             $ip_local      	  [-]$RESET $OKGREEN  
-
-Select from the 'Vulnerability Scanning' menu:
-	
-	1 : Arachni - $OKORANGE  Web Application Security Scanner $RESET $OKGREEN
-	2 : Openvas - $OKORANGE  Vulnerability Scanning $RESET $OKGREEN
-	3 : Nessus - $OKORANGE Vulnerability Scanning Tool $RESET $OKGREEN
-	4 : Burpsuit - $OKORANGE  Toolkit for Web Application Security Testing $RESET $OKGREEN
-	5 : CMS Vulnerability Scanner - $OKORANGE Wordpress,Joomla,Drupal,Liferay  $RESET $OKGREEN
-	6 : OWASP Top 10 Vulnerability Scanner - $OKORANGE SQLi,XXS,LFI,RFI etc  $RESET $OKGREEN
-	
-	99 : Return		
-	$RESET"
-	
-	echo -e "Holla! Your choice is? \c"
-	read  choice
-	
-	case "$choice" in
-	"1")
-		arachni_module
-		;;
-	"2")	
-		#Check Openvas if installed	
-		if apps_exist "openvas-start" ; then
-			#Execute OpenVas
-			open_vas_module
-		else
-			install_apps openvas-start
-		fi
-		;;
-	"3")
-		nessus_module
-		;;
-	"4")
-		burpsuite_module
-		;;
-	"5")
-		CMS_Interface
-		;;
-	"6")
-		OWASP_Interface
-		;;
-	*)
-		#echo "Huhhh! Wrong input!"
-		init
-		;;
-	esac
-}
-
-
-#CMS Scanner Interface
-function CMS_Interface {
-	main_logo
-	echo -e "$OKGREEN
-[+]       Coded BY Muzaffar Mohamed       [+] 
-[-]           coco.oligococo.tk           [-]
-[-]       	    Local IP:         	  [-]$RESET $OKORANGE
-[-]             $ip_local      	  [-]$RESET $OKGREEN  
-
-Select from the 'Vulnerability Scanning' menu:
-	
-	1 : WPScan  - $OKORANGE  WordPress vulnerability scanner $RESET $OKGREEN
-	2 : Joomlavs - $OKORANGE Joomla vulnerability scanner $RESET $OKGREEN
-	3 : Droopescan - $OKORANGE Drupal & Silver Stripe vulnerability scanner $RESET $OKGREEN
-	4 : LiferayScan - $OKORANGE  Liferay vulnerability scanner $RESET $OKGREEN
-	
-	99 : Return		
-	$RESET"
-	
-	echo -e "Holla! Your choice is? \c"
-	read  choice
-	
-	case "$choice" in
-	"1")
-		wpscan_module
-		;;
-	"2")
-		joomlavs_module
-		;;
-	"3")
-		droopescan_module
-		;;
-	"4")
-		liferayscan_module
-		;;
-	*)
-		#echo "Huhhh! Wrong input!"
-		init
-		;;
-	esac
-}
-
-
-#Owasp Interface	
-function OWASP_Interface {
+# Active Recon Common Service Interface --------------------------------------------------------------------------------------------------------	
+function active_recon_common_port_interface {
 	main_logo
 	echo -e "$OKGREEN
 [+]       Coded BY Muzaffar Mohamed       [+] 
@@ -1217,13 +1224,20 @@ function OWASP_Interface {
 
 Select from the 'Nmap command' menu:
 	
-	1 : Shuriken - $OKORANGE  Automated XSS Scanner $RESET $OKGREEN
-	2 : SQLMap - $OKORANGE Automated SQLi Scanner $RESET $OKGREEN
-	3 : Kadimus - $OKORANGE  LFI Scanner $RESET $OKGREEN
-	4 : All-in-one SSL Vulnerability Scan
-	5 : All-in-one Common Web Vulnerability Scan
-	6 : Basic SMB Scanner (TODO: Doublepulsar)
-	7 : Update NSE Script
+	1  : FTP - $OKORANGE (Normally Port 21) $RESET $OKGREEN 
+	2  : IMAP - $OKORANGE (Normally Port 143) $RESET $OKGREEN 
+	3  : MSSQL - $OKORANGE (Normally Port 1433) $RESET $OKGREEN 
+	4  : MYSQL - $OKORANGE (Normally Port 3306) $RESET $OKGREEN 
+	5  : NetBios - $OKORANGE (Internal) $RESET $OKGREEN 
+	6  : POP3 - $OKORANGE (Normally Port 110) $RESET $OKGREEN 
+	7  : SMB - $OKORANGE (Normally Port 445) $RESET $OKGREEN 
+	8  : SMTP - $OKORANGE (Normally Port 25,465,587) $RESET $OKGREEN
+	9  : SNMP - $OKORANGE (Normally Port 161) $RESET $OKGREEN 
+	10 : SSH - $OKORANGE (Normally Port 22) $RESET $OKGREEN 
+	11 : Telnet - $OKORANGE (Normally Port 23) $RESET $OKGREEN 
+	12 : TFTP - $OKORANGE (Normally Port 69) $RESET $OKGREEN 
+	13 : VMWARE
+	14 : VNC - $OKORANGE (Normally Port 5900) $RESET $OKGREEN 
 	
 	99: Return	
 	$RESET"
@@ -1233,144 +1247,52 @@ Select from the 'Nmap command' menu:
 	
 	case "$choice" in
 	"1")
-		OWASP_Interface
+		common_port_ftp_module
 		;;
 	"2")
-		OWASP_Interface
+		common_port_imap_module
 		;;
 	"3")
-		OWASP_Interface
+		common_port_mssql_module
 		;;
 	"4")
-		OWASP_Interface
+		common_port_mysql_module
+		;;
+	"5")
+		common_port_netbios_module
+		;;
+	"6")
+		common_port_pop3_module
+		;;
+	"7")
+		common_port_smb_module
+		;;
+	"8")
+		common_port_smtp_module
+		;;
+	"9")
+		common_port_snmp_module
+		;;
+	"10")
+		common_port_ssh_module
+		;;
+	"11")
+		common_port_telnet_module
+		;;
+	"12")
+		common_port_pop3_module
+		;;
+	"13")
+		common_port_pop3_module
+		;;
+	"14")
+		common_port_pop3_module
 		;;
 	*)
 		#echo "Huhhh! Wrong input!"
-		va_scanning
+		active_recon_interface
 		;;
 	esac
 }
 
-
-#Exploit Interface
-function exploit_interface {
-	main_logo
-	echo -e "$OKGREEN
-[+]       Coded BY Muzaffar Mohamed       [+] 
-[-]           coco.oligococo.tk           [-]
-[-]       	    Local IP:         	  [-]$RESET $OKORANGE
-[-]             $ip_local      	  [-]$RESET $OKGREEN  
-
-Select from the 'Vulnerability Scanning' menu:
-	
-	1 : Fatrat - $OKORANGE  FUD Backdoor Generator $RESET $OKGREEN
-	
-	99 : Return		
-	$RESET"
-	
-	echo -e "Holla! Your choice is? \c"
-	read  choice
-	
-	case "$choice" in
-	"1")		
-		#Check Fatrat if installed	
-		if apps_exist "fatrat" ; then
-			#Execute OpenVas
-			fatrat_module
-		else
-			install_apps fatrat
-		fi
-		;;
-	*)
-		#echo "Huhhh! Wrong input!"
-		init
-		;;
-	esac
-}
-
-
-#Tools Interface
-function tool_interface {
-	main_logo
-	echo -e "$OKGREEN
-[+]       Coded BY Muzaffar Mohamed       [+] 
-[-]           coco.oligococo.tk           [-]
-[-]       	    Local IP:         	  [-]$RESET $OKORANGE
-[-]             $ip_local      	  [-]$RESET $OKGREEN  
-
-Select from the 'Vulnerability Scanning' menu:
-	
-	1 : Owasp Mantra - $OKORANGE  Web Pentest Browser Framework $RESET $OKGREEN
-	2 : CUPP - $OKORANGE  Wordlist Downloader and Generator $RESET $OKGREEN
-	
-	99 : Return		
-	$RESET"
-	
-	echo -e "Holla! Your choice is? \c"
-	read  choice
-	
-	case "$choice" in
-	"1")		
-		#Check Mantra if installed	
-		if apps_exist "owasp-mantra-ff" ; then
-			#Execute Mantra
-			mantra_module
-		else
-			install_apps mantra
-		fi
-		;;
-	"2")		
-		#Check cupp if installed	
-		if apps_exist "./$application_path$cupp_folder/cupp.py" ; then
-			#Execute Mantra
-			cupp_module
-		else
-			install_apps cupp
-		fi
-		;;
-	*)
-		#echo "Huhhh! Wrong input!"
-		init
-		;;
-	esac
-}
-
-
-#Dependency Check
-function setup {
-	main_logo
-	echo ""
-	echo -e "$OKRED [!]::[Check Dependencies]: $RESET"
-	echo ""
-
-		for i in "${required_apps[@]}"
-		do
-			if apps_exist $i ; then
-				echo -e "$OKGREEN	[✔-OK!]::[Apps]: $i $RESET"
-			else
-				echo -e "$OKRED	[x-Missing!]::[Apps]: $i $RESET"
-				install_apps $i
-			fi
-		done
-		}
-
-		
-#    __  __       _       
-#   |  \/  |     (_)      
-#   | \  / | __ _ _ _ __  
-#   | |\/| |/ _` | | '_ \ 
-#   | |  | | (_| | | | | |
-#   |_|  |_|\__,_|_|_| |_|
-#                         
-#                         
-setup
 init
-
-#Update
-#nikto -update
-
-# TODO
-# python3 altinstall
-# autodownload nmap NSE script
-# Use another frame to install openvas
-# 
