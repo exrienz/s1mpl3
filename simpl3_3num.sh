@@ -11,7 +11,7 @@
 
 
 #System
-declare -r app_version='BETA 1.0'
+declare -r app_version='BETA 1.1'
 
 
 #Auto Update Script
@@ -78,7 +78,7 @@ declare -r massbleed_folder='MassBleed'
 
 
 #AUTOINSTALL APPLICATION
-declare -a required_apps=("sniper" 
+declare -a required_apps=("./$application_path$sniper_folder/sniper" 
 						"./$application_path$theHarvester_folder/theHarvester.py"
 						"./$application_path$domain_analyzer_folder/domain_analyzer.py"
 						"./$application_path$ssh_audit_folder/ssh-audit.py"
