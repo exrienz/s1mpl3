@@ -846,8 +846,7 @@ Select from the menu:
 	
 	1 : Passive Reconnaisance
 	2 : Active Reconnaisance
-	3 : Vulnerability Assessment
-	4 : Search for Common Exploit
+	3 : Search for Common Exploit
 	9 : Update $SELF script
 	
 	99: Exit
@@ -864,9 +863,6 @@ Select from the menu:
 		active_recon_interface
 		;;
 	"3")
-		va_scan
-		;;
-	"4")
 		search_common_exploit
 		;;
 	"9")
