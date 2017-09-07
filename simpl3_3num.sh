@@ -11,7 +11,7 @@
 
 
 #System
-declare -r app_version='BETA 1.5'
+declare -r app_version='BETA 1.6'
 
 
 #Auto Update Script
@@ -584,6 +584,19 @@ function nmap_email_enumerator_module {
 	active_recon_nmap_interface
 	}
 
+
+#Domain Analyzer
+function domain_analyzer_module {
+	echo -e "What is your host? (No sub-domain!) e.g. example.com  \c"
+	read hosts
+	output="Domain_Analysis"
+	mkdir -p $report_path$hosts 2> /dev/null
+	echo ""
+	./$application_path$domain_analyzer_folder/domain_analyzer.py -d $hosts -a -B | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g" | sed "s/\x0f//g" |& tee -a  $report_path$hosts/$output.txt;
+	x-www-browser $report_path$hosts/$output.txt 2> /dev/null &
+	active_recon_interface
+}
+	
 #Web/port capture
 function active_recon_capture_module {
 	echo -e "Http or Https? \c"
@@ -676,31 +689,33 @@ function active_recon_ssl_analyzer {
 
 #Skipfish web crawler
 function active_web_crawler_module {
-	echo -e "Http or Https? \c"
-	read protocols
+	# echo -e "Http or Https? \c"
+	# read protocols
 	echo -e "What is your host? e.g. www.example.com  \c"
 	read hosts
-	echo -e "Got Cookies? [y/n] \c"
-	read auth_cookies
+	# echo -e "Got Cookies? [y/n] \c"
+	# read auth_cookies
 	
-	case "$auth_cookies" in
-	"y")
-		echo -e "Insert The Cookie Values \c"
-		read cookies_value
-		the_cookies="-C name=$cookies_value"
-		;;
-	*)
-		the_cookies=""
-		;;
-	esac
+	# case "$auth_cookies" in
+	# "y")
+		# echo -e "Insert The Cookie Values \c"
+		# read cookies_value
+		# the_cookies="-C name=$cookies_value"
+		# ;;
+	# *)
+		# the_cookies=""
+		# ;;
+	# esac
 	
-	echo -e "How deep you want to crawl? e.g. (Max:16)  \c"
-	read depth
+	# echo -e "How deep you want to crawl? e.g. (Max:16)  \c"
+	# read depth
 	output="Web_Crawler"
 	mkdir -p $report_path$hosts 2> /dev/null
-	echo ""
-	skipfish -d $depth $the_cookies -o $report_path$hosts/$output $protocols://$hosts;
-	x-www-browser $report_path$hosts/$output/index.html 2> /dev/null &
+	# echo ""
+	# skipfish -d $depth $the_cookies -o $report_path$hosts/$output $protocols://$hosts;
+	./$application_path$domain_analyzer_folder/crawler.py -u $hosts -w -s -m 100 | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g" | sed "s/\x0f//g" |& tee -a  $report_path$hosts/$output.txt;
+	x-www-browser $report_path$hosts/$output.txt 2> /dev/null &
+	# x-www-browser $report_path$hosts/$output/index.html 2> /dev/null &
 	active_recon_interface
 	}
 	
@@ -1024,17 +1039,18 @@ function active_recon_interface {
 Select from the 'Reconnaisance' menu:
 	
 	1  : Nmap - $OKORANGE Port Scanner $RESET $OKGREEN
-	2  : CutyCapt - $OKORANGE Capture Port Interface $RESET $OKGREEN
-	3  : Nikto - $OKORANGE Basic Vunerability Assessment Tool $RESET $OKGREEN
-	4  : WhatWeb - $OKORANGE CMS Identifier Module $RESET $OKGREEN
-	5  : LBD - $OKORANGE Load Balancer Detector $RESET $OKGREEN
-	6  : WAF Identifier - $OKORANGE Server Technology Scanner $RESET $OKGREEN
-	7  : SSL Analyzer - $OKORANGE Analyze SSL Security $RESET $OKGREEN
-	8  : Web Spider - $OKORANGE Simple Web Crawler $RESET $OKGREEN
-	9  : Dirb - $OKORANGE Hidden Web Directory Bruteforcer $RESET $OKGREEN
-	10 : HTTP Method Analyzer - $OKORANGE Http Method Analyzer $RESET $OKGREEN
-	11 : Armitage - $OKORANGE GUI Based Metasploit $RESET $OKGREEN
-	12 : Burpsuite - $OKORANGE Proxy-based WAPT Framework $RESET $OKGREEN
+	2  : Domain Analyzer - $OKORANGE Top-Level Domain Analyzer $RESET $OKGREEN
+	3  : CutyCapt - $OKORANGE Capture Port Interface $RESET $OKGREEN
+	4  : Nikto - $OKORANGE Basic Vunerability Assessment Tool $RESET $OKGREEN
+	5  : WhatWeb - $OKORANGE CMS Identifier Module $RESET $OKGREEN
+	6  : LBD - $OKORANGE Load Balancer Detector $RESET $OKGREEN
+	7  : WAF Identifier - $OKORANGE Server Technology Scanner $RESET $OKGREEN
+	8  : SSL Analyzer - $OKORANGE Analyze SSL Security $RESET $OKGREEN
+	9  : Web Spider - $OKORANGE Simple Web Crawler $RESET $OKGREEN
+	10 : Dirb - $OKORANGE Hidden Web Directory Bruteforcer $RESET $OKGREEN
+	11 : HTTP Method Analyzer - $OKORANGE Http Method Analyzer $RESET $OKGREEN
+	12 : Armitage - $OKORANGE GUI Based Metasploit $RESET $OKGREEN
+	13 : Burpsuite - $OKORANGE Proxy-based WAPT Framework $RESET $OKGREEN
 	
 	99 : Return		
 	$RESET"
@@ -1042,44 +1058,45 @@ Select from the 'Reconnaisance' menu:
 	echo -e "Holla! Your choice is? \c"
 	read  choice
 	
-	
-	
 	case "$choice" in
 	"1")
 		active_recon_nmap_interface
 		;;
 	"2")
-		active_recon_capture_module
+		domain_analyzer_module
 		;;
 	"3")
-		active_recon_nikto_module
+		active_recon_capture_module
 		;;
 	"4")
-		active_cms_identifier_module
+		active_recon_nikto_module
 		;;
 	"5")
-		active_recon_load_balancer_module
+		active_cms_identifier_module
 		;;
 	"6")
-		active_recon_wafw00f_module
+		active_recon_load_balancer_module
 		;;
 	"7")
-		active_recon_ssl_analyzer
+		active_recon_wafw00f_module
 		;;
 	"8")
-		active_web_crawler_module
+		active_recon_ssl_analyzer
 		;;
 	"9")
-		active_brute_dir_module
+		active_web_crawler_module
 		;;
 	"10")
-		active_http_method_module
+		active_brute_dir_module
 		;;
 	"11")
+		active_http_method_module
+		;;
+	"12")
 		xterm -e "service postgresql start && armitage" &
 		active_recon_interface
 		;;
-	"12")
+	"13")
 		xterm -e "burpsuite" &
 		active_recon_interface
 		;;
