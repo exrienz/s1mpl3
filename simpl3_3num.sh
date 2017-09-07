@@ -496,12 +496,13 @@ function nmap_module {
 		
 		# . ./snipe.sh |& tee -a $report_path$hosts/$outputII.txt &&
 		# wait			
-		# #active_recon_nmap_interface
+		# active_recon_nmap_interface
 		# ;;
 	# *)
-		active_recon_nmap_interface
-		;;
-	esac
+		# active_recon_nmap_interface
+		# ;;
+	# esac
+	active_recon_nmap_interface
 	}	
 
 	
