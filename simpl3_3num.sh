@@ -11,7 +11,7 @@
 
 
 #System
-declare -r app_version='BETA 1.2'
+declare -r app_version='BETA 1.3'
 
 
 #Auto Update Script
@@ -461,11 +461,11 @@ function pa_gatling_gun {
 function nmap_module {
 	echo -e "What is your host? e.g. www.example.com  \c"
 	read hosts
-	echo -e "Use Vulscan? [y/n]  \c"
+	echo -e "Use Vulscan (Might consist False Positive!) ? [y/n]  \c"
 	read vul_resp	
 		case "$vul_resp" in
 		"y")
-			vulscan_value="--script=vulscan/vulscan.nse"
+			vulscan_value="--script=vulscan/vulscan.nse  --script-args vulscandb=exploitdb.csv"
 			;;
 			*)
 				vulscan_value=""
@@ -503,19 +503,19 @@ function nmap_module {
 		# ;;
 	# esac
 	active_recon_nmap_interface
-	}	
+	}
 
-	
-#NMap Stealth Module
+
+#NMap Stealth Scan	
 function nmap_stealth_module {
 	echo -e "What is your host? e.g. www.example.com  \c"
 	read hosts
 	mkdir -p $report_path$hosts 2> /dev/null
 	output="Nmap_Stealth_Scan_Report"
-	nmap --mtu 24 -A -v  $hosts -oX $report_path$hosts/$output.xml 2> /dev/null
+	nmap --mtu 24 -A -sV  $hosts -oX $report_path$hosts/$output.xml 2> /dev/null
 	xml2html $hosts $output
 	active_recon_nmap_interface
-	}
+	}		
 	
 	
 #NMap UDP Module
@@ -638,7 +638,18 @@ function active_recon_wafw00f_module {
 	active_recon_interface
 	}
 
-#Clodflare Module
+
+#CMS Identifier Module
+function active_cms_identifier_module {
+	echo -e "What is your host? e.g. www.example.com  \c"
+	read hosts
+	output="Site_Engine_Identifier_Report"
+	mkdir -p $report_path$hosts 2> /dev/null
+	echo ""
+	whatweb -a 3 -v $hosts | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g" | sed "s/\x0f//g" |& tee -a  $report_path$hosts/$output.txt;
+	x-www-browser $report_path$hosts/$output.txt 2> /dev/null &
+	active_recon_interface
+	}	
 
 
 #SSL Analyzer module
@@ -1020,20 +1031,23 @@ Select from the 'Reconnaisance' menu:
 	1  : Nmap - $OKORANGE Port Scanner $RESET $OKGREEN
 	2  : CutyCapt - $OKORANGE Capture Port Interface $RESET $OKGREEN
 	3  : Nikto - $OKORANGE Basic Vunerability Assessment Tool $RESET $OKGREEN
-	4  : LBD - $OKORANGE Load Balancer Detector $RESET $OKGREEN
-	5  : WAF Identifier - $OKORANGE Server Technology Scanner $RESET $OKGREEN
-	6  : SSL Analyzer - $OKORANGE Server Configuration Scanner $RESET $OKGREEN
-	7  : Web Spider - $OKORANGE Simple Web Crawler $RESET $OKGREEN
-	8  : Dirb - $OKORANGE Hidden Web Directory Bruteforcer $RESET $OKGREEN
-	9  : HTTP Method Analyzer - $OKORANGE Http Method Analyzer $RESET $OKGREEN
-	10 : Armitage - $OKORANGE GUI Based Metasploit $RESET $OKGREEN
-	11 : Burpsuite - $OKORANGE GUI Based Metasploit $RESET $OKGREEN
+	4  : WhatWeb - $OKORANGE CMS Identifier Module $RESET $OKGREEN
+	5  : LBD - $OKORANGE Load Balancer Detector $RESET $OKGREEN
+	6  : WAF Identifier - $OKORANGE Server Technology Scanner $RESET $OKGREEN
+	7  : SSL Analyzer - $OKORANGE Analyze SSL Security $RESET $OKGREEN
+	8  : Web Spider - $OKORANGE Simple Web Crawler $RESET $OKGREEN
+	9  : Dirb - $OKORANGE Hidden Web Directory Bruteforcer $RESET $OKGREEN
+	10 : HTTP Method Analyzer - $OKORANGE Http Method Analyzer $RESET $OKGREEN
+	11 : Armitage - $OKORANGE GUI Based Metasploit $RESET $OKGREEN
+	12 : Burpsuite - $OKORANGE Proxy-based WAPT Framework $RESET $OKGREEN
 	
 	99 : Return		
 	$RESET"
 	
 	echo -e "Holla! Your choice is? \c"
 	read  choice
+	
+	
 	
 	case "$choice" in
 	"1")
@@ -1046,28 +1060,31 @@ Select from the 'Reconnaisance' menu:
 		active_recon_nikto_module
 		;;
 	"4")
-		active_recon_load_balancer_module
+		active_cms_identifier_module
 		;;
 	"5")
-		active_recon_wafw00f_module
+		active_recon_load_balancer_module
 		;;
 	"6")
-		active_recon_ssl_analyzer
+		active_recon_wafw00f_module
 		;;
 	"7")
-		active_web_crawler_module
+		active_recon_ssl_analyzer
 		;;
 	"8")
-		active_brute_dir_module
+		active_web_crawler_module
 		;;
 	"9")
-		active_http_method_module
+		active_brute_dir_module
 		;;
 	"10")
+		active_http_method_module
+		;;
+	"11")
 		xterm -e "service postgresql start && armitage" &
 		active_recon_interface
 		;;
-	"11")
+	"12")
 		xterm -e "burpsuite" &
 		active_recon_interface
 		;;
@@ -1167,7 +1184,7 @@ init
 
 
 ####TODO
-#	1. Fix gatling_gun
+#	1. Harvester cant create dir
 #	2. Add Default Credential Pages 
 #
 #
