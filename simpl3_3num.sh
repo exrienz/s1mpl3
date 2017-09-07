@@ -11,7 +11,7 @@
 
 
 #System
-declare -r app_version='BETA 1.3'
+declare -r app_version='BETA 1.4'
 
 
 #Auto Update Script
