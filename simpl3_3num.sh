@@ -11,7 +11,7 @@
 
 
 #System
-declare -r app_version='BETA 1.1'
+declare -r app_version='BETA 1.2'
 
 
 #Auto Update Script
@@ -1022,14 +1022,12 @@ Select from the 'Reconnaisance' menu:
 	3  : Nikto - $OKORANGE Basic Vunerability Assessment Tool $RESET $OKGREEN
 	4  : LBD - $OKORANGE Load Balancer Detector $RESET $OKGREEN
 	5  : WAF Identifier - $OKORANGE Server Technology Scanner $RESET $OKGREEN
-	6  : Cloudflare Reconnaisance - $OKORANGE Identify IP Behind Cloudflare $RESET $OKGREEN
-	7  : SSL Analyzer - $OKORANGE Server Configuration Scanner $RESET $OKGREEN
-	8  : Web Spider - $OKORANGE Simple Web Crawler $RESET $OKGREEN
-	9  : Dirb - $OKORANGE Hidden Web Directory Bruteforcer $RESET $OKGREEN
-	10 : HTTP Method Analyzer - $OKORANGE Http Method Analyzer $RESET $OKGREEN
-	11 : Sniper - $OKORANGE GUI Based Metasploit $RESET $OKGREEN
-	12 : Armitage - $OKORANGE GUI Based Metasploit $RESET $OKGREEN
-	13 : Burpsuite - $OKORANGE GUI Based Metasploit $RESET $OKGREEN
+	6  : SSL Analyzer - $OKORANGE Server Configuration Scanner $RESET $OKGREEN
+	7  : Web Spider - $OKORANGE Simple Web Crawler $RESET $OKGREEN
+	8  : Dirb - $OKORANGE Hidden Web Directory Bruteforcer $RESET $OKGREEN
+	9  : HTTP Method Analyzer - $OKORANGE Http Method Analyzer $RESET $OKGREEN
+	10 : Armitage - $OKORANGE GUI Based Metasploit $RESET $OKGREEN
+	11 : Burpsuite - $OKORANGE GUI Based Metasploit $RESET $OKGREEN
 	
 	99 : Return		
 	$RESET"
@@ -1054,30 +1052,22 @@ Select from the 'Reconnaisance' menu:
 		active_recon_wafw00f_module
 		;;
 	"6")
-		#TODO
-		active_recon_interface
-		;;
-	"7")
 		active_recon_ssl_analyzer
 		;;
-	"8")
+	"7")
 		active_web_crawler_module
 		;;
-	"9")
+	"8")
 		active_brute_dir_module
 		;;
-	"10")
+	"9")
 		active_http_method_module
 		;;
-	"11")
-		xterm -e "sniper" &
-		active_recon_interface
-		;;
-	"12")
+	"10")
 		xterm -e "service postgresql start && armitage" &
 		active_recon_interface
 		;;
-	"13")
+	"11")
 		xterm -e "burpsuite" &
 		active_recon_interface
 		;;
