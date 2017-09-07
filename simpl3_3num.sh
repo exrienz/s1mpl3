@@ -11,7 +11,7 @@
 
 
 #System
-declare -r app_version='BETA 1.4'
+declare -r app_version='BETA 1.5'
 
 
 #Auto Update Script
@@ -846,7 +846,6 @@ Select from the menu:
 	
 	1 : Passive Reconnaisance
 	2 : Active Reconnaisance
-	3 : Search for Common Exploit
 	9 : Update $SELF script
 	
 	99: Exit
