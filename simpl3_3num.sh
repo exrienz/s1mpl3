@@ -387,16 +387,13 @@ function pa_online_tools {
 
 #Passive Online Credential Harvester
 function pa_harvester {
-	echo -e "What is your host (Dont use subdomain!)? e.g. example.com  \c"
+	echo -e "What is your root host? e.g. example.com (NO SUBDOMAIN!)  \c"
 	read hosts
 	output="Email_Domain_Harvest_Report"
 	mkdir -p $report_path$hosts 2> /dev/null
-	xterm -e "python $application_path$theHarvester_folder/theHarvester.py -d $hosts -l 500 -b all -f $report_path$hosts/$output.html" & 
-	wait
-	#python $application_path$theHarvester_folder/theHarvester.py -d $hosts -l 500 -b all -h email_harvest.html |& tee $report_path$hosts/$output.txt
-	x-www-browser --new-tab -url $report_path$hosts/$output.html &
+	xterm -e "python $application_path$theHarvester_folder/theHarvester.py -d $hosts -l 500 -b all -f $output.html; mv $output.html $report_path$hosts; rm -f $output.xml; x-www-browser --new-tab -url '$report_path/$hosts/$output.html'" &
 	passive_recon_interface
-	}	
+	}
 
 
 #Passive Gatling Gun	
@@ -480,26 +477,28 @@ function nmap_module {
 	output="Nmap_OS_and_Service_Scan_Report"
 	nmap -sS -Pn -sV $vulscan_value --script=whois-ip,banner,iscsi-brute,isns-info,ntp-info,fingerprint-strings $hosts -oX $report_path$hosts/$output.xml 2> /dev/null
 	xml2htmlII $hosts $output
-	echo
-	echo -e "Use auto-pawn (Might destructive!)? [y/n]  \c"
-	read actions
-	echo	
-	case "$actions" in
-	"y")
-						
-		export TARGET="$hosts"
-		export PATHS="$report_path$hosts/$output.xml"
-		export CURRENT_PATH="$default_directory/"
-		export APPLICATION_PATH="$application_path"
-		export REPORT_PATH="$report_path"
+	# echo
+	# echo -e "Use auto-pawn (Might destructive!)? [y/n]  \c"
+	# read actions
+	# echo	
+	# case "$actions" in
+	# "y")
 		
-		outputII="Detailed_Port_Analysis_Report"
+		# service postgresql start				
 		
-		. ./snipe.sh |& tee -a $report_path$hosts/$outputII.txt &&
-		wait			
-		#active_recon_nmap_interface
-		;;
-	*)
+		# export TARGET="$hosts"
+		# export PATHS="$report_path$hosts/$output.xml"
+		# export CURRENT_PATH="$default_directory/"
+		# export APPLICATION_PATH="$application_path"
+		# export REPORT_PATH="$report_path"
+		
+		# outputII="Detailed_Port_Analysis_Report"
+		
+		# . ./snipe.sh |& tee -a $report_path$hosts/$outputII.txt &&
+		# wait			
+		# #active_recon_nmap_interface
+		# ;;
+	# *)
 		active_recon_nmap_interface
 		;;
 	esac
@@ -658,16 +657,105 @@ function active_recon_ssl_analyzer {
 	echo ""
 	testssl $hosts | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g" | sed "s/\x0f//g" |& tee -a  $report_path$hosts/$output.txt;
 	
+	x-www-browser $report_path$hosts/$output.txt 2> /dev/null &
+	active_recon_interface
 }
 
-  | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g" | sed "s/\x0f//g" |& tee -a  $new_path$output.txt; 
 
-
-
+#Skipfish web crawler
+function active_web_crawler_module {
+	echo -e "Http or Https? \c"
+	read protocols
+	echo -e "What is your host? e.g. www.example.com  \c"
+	read hosts
+	echo -e "Got Cookies? [y/n] \c"
+	read auth_cookies
 	
-#sslyze --resum --certinfo=basic --compression --reneg --sslv2 --sslv3 --hide_rejected_ciphers $TARGET
-#sslscan --no-failed $TARGET 
-#testssl $TARGET
+	case "$auth_cookies" in
+	"y")
+		echo -e "Insert The Cookie Values \c"
+		read cookies_value
+		the_cookies="-C name=$cookies_value"
+		;;
+	*)
+		the_cookies=""
+		;;
+	esac
+	
+	echo -e "How deep you want to crawl? e.g. (Max:16)  \c"
+	read depth
+	output="Web_Crawler"
+	mkdir -p $report_path$hosts 2> /dev/null
+	echo ""
+	skipfish -d $depth $the_cookies -o $report_path$hosts/$output $protocols://$hosts;
+	x-www-browser $report_path$hosts/$output/index.html 2> /dev/null &
+	active_recon_interface
+	}
+	
+	
+#Dirb Module
+function active_brute_dir_module {
+	echo -e "Http or Https? \c"
+	read protocols
+	echo -e "What is your host? e.g. www.example.com  \c"
+	read hosts
+	wordlist
+	echo -e "Use wordlist path:  \c"
+	read use_word_list
+	mkdir -p $report_path$hosts 2> /dev/null
+	echo -e "Bruteforce directory or file? [dir/file]  \c"
+	read responses
+
+	case "$responses" in
+	"file")
+		output="Web_Files_Bruteforce_Report"
+		echo -e "File Type (can be more than one)?: e.g. [.php,.html,.asp,.others..] \c"
+		read file_type
+		xterm -e "dirb $protocols://$hosts/ -X $file_type $use_word_list  -o $report_path$hosts/$output.txt && $report_path$hosts/$output.txt 2> /dev/null ; x-www-browser $report_path$hosts/$output.txt 2> /dev/null" &
+		active_recon_interface
+		;;
+	*)
+		output="Web_Directory_Bruteforce_Report"
+		xterm -e "dirb $protocols://$hosts/ $use_word_list  -o $report_path$hosts/$output.txt && $report_path$hosts/$output.txt 2> /dev/null ; x-www-browser $report_path$hosts/$output.txt 2> /dev/null" &
+		active_recon_interface
+		;;
+	esac
+	}
+
+
+#Http Method Module
+function active_http_method_module {
+	response='y'  
+	while [ ${response:0:1} != n ]  
+	do  
+		output="HTTP_Method_Report"
+		# Command(s) 
+		echo
+		#echo -e "Enter Link to test (e.g: www.example.com)  \c"
+		#read links
+		echo -e "Enter Link to test (e.g: www.example.com)  \c"
+		read hosts
+		mkdir -p $report_path$hosts 2> /dev/null
+		echo -e "Please provide list of URL to be checked [PATH]:  \c"
+		read links
+		while IFS= read line
+		do
+			# display $line or do somthing with $line
+			# echo "$line"
+			echo "URL : $line" >> $report_path$hosts/$output.txt
+			curl -i -X OPTIONS $line >> $report_path$hosts/$output.txt
+			echo >> $report_path$hosts/$output.txt
+			echo
+			echo 
+			echo
+		done <"$links"
+		
+		read -p "Test again? Y/n " response 		
+		[[ ${#response} -eq 0 ]] && response='y'  
+	done 	
+	xdg-open $report_path$hosts/$output.txt 2> /dev/null &
+	active_recon_interface
+	}
 	
 	
 	
@@ -972,13 +1060,24 @@ Select from the 'Reconnaisance' menu:
 		active_recon_ssl_analyzer
 		;;
 	"8")
-		pa_online_tools $pa_aio_url
+		active_web_crawler_module
 		;;
 	"9")
-		active_recon_common_port_interface
+		active_brute_dir_module
 		;;
 	"10")
+		active_http_method_module
+		;;
+	"11")
+		xterm -e "sniper" &
+		active_recon_interface
+		;;
+	"12")
 		xterm -e "service postgresql start && armitage" &
+		active_recon_interface
+		;;
+	"13")
+		xterm -e "burpsuite" &
 		active_recon_interface
 		;;
 	*)
@@ -1043,88 +1142,6 @@ Select from the 'Nmap command' menu:
 	esac
 }
 
-
-# Active Recon Common Service Interface --------------------------------------------------------------------------------------------------------	
-function active_recon_common_port_interface {
-	main_logo
-	echo -e "$OKGREEN
-[+]       Coded BY Muzaffar Mohamed       [+] 
-[-]           coco.oligococo.tk           [-]
-[-]       	    Local IP:         	  [-]$RESET $OKORANGE
-[-]             $ip_local      	  [-]$RESET $OKGREEN  
-
-Select from the 'Nmap command' menu:
-	
-	1  : FTP (Normally Port 21)
-	2  : IMAP (Normally Port 143)
-	3  : MSSQL (Normally Port 1433)
-	4  : MYSQL (Normally Port 3306)
-	5  : NetBios (Normally Port 137) [Internal] 
-	6  : POP3 (Normally Port 110)
-	7  : SMB (Normally Port 445)
-	8  : SMTP (Normally Port 25)
-	9  : SNMP (Normally Port 161)
-	10 : SSH (Normally Port 22)
-	11 : Telnet (Normally Port 23)
-	12 : TFTP (Normally Port 69)
-	13 : VMWARE
-	14 : VNC (Normally Port 5900)
-	
-	99: Return	
-	$RESET"
-	
-	echo -e "Hey! Your choice is? \c"
-	read  choice
-	
-	case "$choice" in
-	"1")
-		common_port_ftp_module
-		;;
-	"2")
-		common_port_imap_module
-		;;
-	"3")
-		common_port_mssql_module
-		;;
-	"4")
-		common_port_mysql_module
-		;;
-	"5")
-		common_port_netbios_module
-		;;
-	"6")
-		common_port_pop3_module
-		;;
-	"7")
-		common_port_smb_module
-		;;
-	"8")
-		common_port_pop3_module
-		;;
-	"9")
-		common_port_pop3_module
-		;;
-	"10")
-		common_port_pop3_module
-		;;
-	"11")
-		common_port_pop3_module
-		;;
-	"12")
-		common_port_pop3_module
-		;;
-	"13")
-		common_port_pop3_module
-		;;
-	"14")
-		common_port_pop3_module
-		;;
-	*)
-		#echo "Huhhh! Wrong input!"
-		active_recon_interface
-		;;
-	esac
-}
 
 #Dependency Check
 function setup {
