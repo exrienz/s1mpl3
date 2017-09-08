@@ -964,7 +964,7 @@ function passive_recon_online_tools_interface {
 [-]       	    Local IP:         	  [-]$RESET $OKORANGE
 [-]             $ip_local      	  [-]$RESET $OKGREEN  
 
-Select from the 'Online Tools' menu:
+Select from the 'Passive Online Tools' menu:
 	
 	1  : Nmap - $OKORANGE Open Ports & Running Services Scanner $RESET $OKGREEN
 	2  : Hostmap - $OKORANGE Hostnames & Virtual Hosts Discovery Tool $RESET $OKGREEN
@@ -1036,7 +1036,7 @@ function active_recon_interface {
 [-]       	    Local IP:         	  [-]$RESET $OKORANGE
 [-]             $ip_local      	  [-]$RESET $OKGREEN  
 
-Select from the 'Reconnaisance' menu:
+Select from the 'Active Reconnaisance' menu:
 	
 	1  : Nmap - $OKORANGE Port Scanner $RESET $OKGREEN
 	2  : Domain Analyzer - $OKORANGE Top-Level Domain Analyzer $RESET $OKGREEN
