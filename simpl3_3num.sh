@@ -11,7 +11,7 @@
 
 
 #System
-declare -r app_version='BETA 1.7'
+declare -r app_version='BETA 1.8'
 
 
 #Auto Update Script
@@ -713,7 +713,7 @@ function active_web_crawler_module {
 	mkdir -p $report_path$hosts 2> /dev/null
 	# echo ""
 	# skipfish -d $depth $the_cookies -o $report_path$hosts/$output $protocols://$hosts;
-	./$application_path$domain_analyzer_folder/crawler.py -u $hosts -w -s -m 100 | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g" | sed "s/\x0f//g" |& tee -a  $report_path$hosts/$output.txt;
+	./$application_path$domain_analyzer_folder/crawler.py -u $hosts -s -m 100 | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g" | sed "s/\x0f//g" |& tee -a  $report_path$hosts/$output.txt;
 	x-www-browser $report_path$hosts/$output.txt 2> /dev/null &
 	# x-www-browser $report_path$hosts/$output/index.html 2> /dev/null &
 	active_recon_interface
