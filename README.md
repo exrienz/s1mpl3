@@ -1,4 +1,4 @@
-# S1mpl3 is a simple script which has been developed to ease pentester process of conducting active and passive reconnaisance.
+# s1mpl3 is a simple script which has been developed to ease pentester process of conducting active and passive reconnaisance.
 
 Tested working on Kali Linux
 
