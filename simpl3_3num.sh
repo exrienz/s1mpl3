@@ -11,7 +11,7 @@
 
 
 #System
-declare -r app_version='BETA 1.6'
+declare -r app_version='BETA 1.7'
 
 
 #Auto Update Script
@@ -1040,11 +1040,11 @@ Select from the 'Reconnaisance' menu:
 	
 	1  : Nmap - $OKORANGE Port Scanner $RESET $OKGREEN
 	2  : Domain Analyzer - $OKORANGE Top-Level Domain Analyzer $RESET $OKGREEN
-	3  : CutyCapt - $OKORANGE Capture Port Interface $RESET $OKGREEN
+	3  : CutyCapt - $OKORANGE Capture Web Port Interface $RESET $OKGREEN
 	4  : Nikto - $OKORANGE Basic Vunerability Assessment Tool $RESET $OKGREEN
 	5  : WhatWeb - $OKORANGE CMS Identifier Module $RESET $OKGREEN
 	6  : LBD - $OKORANGE Load Balancer Detector $RESET $OKGREEN
-	7  : WAF Identifier - $OKORANGE Server Technology Scanner $RESET $OKGREEN
+	7  : WAF Identifier - $OKORANGE Web Application Firewall Scanner $RESET $OKGREEN
 	8  : SSL Analyzer - $OKORANGE Analyze SSL Security $RESET $OKGREEN
 	9  : Web Spider - $OKORANGE Simple Web Crawler $RESET $OKGREEN
 	10 : Dirb - $OKORANGE Hidden Web Directory Bruteforcer $RESET $OKGREEN
