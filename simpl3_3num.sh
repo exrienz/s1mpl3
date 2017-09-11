@@ -11,7 +11,7 @@
 
 
 #System
-declare -r app_version='BETA 1.9'
+declare -r app_version='BETA 2.0'
 
 
 #Auto Update Script
@@ -356,6 +356,7 @@ function pa_aio_site {
 	read hosts
 
 	declare -a dorks=(" -url https://www.threatcrowd.org/domain.php?domain=$hosts"
+					" -url https://www.robtex.com/dns-lookup/$hosts"
 					" -url http://www.dnsstuff.com/tools#dnsReport|type=domain&&value=$hosts"
 					" -url https://www.tcpiputils.com/browse/domain/$hosts"
 					" -url http://toolbar.netcraft.com/site_report?url=$hosts"
@@ -714,7 +715,7 @@ function active_web_crawler_module {
 	# echo ""
 	# skipfish -d $depth $the_cookies -o $report_path$hosts/$output $protocols://$hosts;
 	echo -e "$OKRED	[✔-OK!]::[Progress]: Crawling in progress..Please Wait! $RESET"
-	./$application_path$domain_analyzer_folder/crawler.py -u $hosts -s -m 100 | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g" | sed "s/\x0f//g" |& tee -a  $report_path$hosts/$output.txt;
+	./$application_path$domain_analyzer_folder/crawler.py -u $hosts -s -m 100 | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g" | sed "s/\x0f//g"  >  $report_path$hosts/$output.txt;
 	x-www-browser $report_path$hosts/$output.txt 2> /dev/null &
 	# x-www-browser $report_path$hosts/$output/index.html 2> /dev/null &
 	active_recon_interface
