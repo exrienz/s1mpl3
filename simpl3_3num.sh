@@ -644,9 +644,8 @@ function active_recon_nikto_module {
 	nikto -h $protocols://$hosts |& tee -a |& tee -a  $report_path$hosts/$output.txt;
 	x-www-browser $report_path$hosts/$output.txt 2> /dev/null &
 	#Spaghetti Scan
-	python /$application_path$spaghetti_folder/spaghetti.py --url $hosts --scan 0 --random-agent --verbose
+	python $application_path$spaghetti_folder/spaghetti.py --url $hosts --scan 0 --random-agent --verbose
 	
-		
 	#Show Report
 	while true;
 	do
