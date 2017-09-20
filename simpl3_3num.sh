@@ -11,7 +11,7 @@
 
 
 #System
-declare -r app_version='BETA 2.1'
+declare -r app_version='BETA 2.2'
 
 
 #Auto Update Script
@@ -631,22 +631,28 @@ function active_recon_nikto_module {
 	read protocols
 	echo -e "What is your host? e.g. www.example.com  \c"
 	read hosts
-	output1="Nikto_Report"
+	output="Basic_Vulnerability_Report"
 	rm -f $report_path$hosts/$output.html
 	mkdir -p $report_path$hosts 2> /dev/null
 	echo ""
-	
 	#Nikto_Scan
-	nikto -h $protocols://$hosts -F htm -output $output1.html
-	mv $output1.html $report_path$hosts/$output1.html 
-	
-	#Spaghetti_Scan
-	output2="Spaghetti_Report"
-	python /$application_path$spaghetti_folder/spaghetti.py --url $hosts --scan 0 --random-agent --verbose  | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g" | sed "s/\x0f//g" |& tee -a  $report_path$hosts/$output2.txt;
+	echo " __ _  __  __ _  ____  __     ____   ___   __   __ _ " |& tee -a  $report_path$hosts/$output.txt;
+	echo "(  ( \(  )(  / )(_  _)/  \   / ___) / __) / _\ (  ( \ " |& tee -a  $report_path$hosts/$output.txt;
+	echo "/    / )(  )  (   )( (  O )  \___ \( (__ /    \/    / " |& tee -a  $report_path$hosts/$output.txt;
+	echo "\_)__)(__)(__\_) (__) \__/   (____/ \___)\_/\_/\_)__)" |& tee -a  $report_path$hosts/$output.txt;
+	echo "" |& tee -a  $report_path$hosts/$output.txt;
+	nikto -h $protocols://$hosts | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g" | sed "s/\x0f//g" |& tee -a  $report_path$hosts/$output.txt;
+	#Spaghetti Scan
+	echo "" |& tee -a  $report_path$hosts/$output.txt;
+	echo " ____  ____   __    ___  _  _  ____  ____  ____  __    ____   ___   __   __ _ " |& tee -a  $report_path$hosts/$output.txt;
+	echo "/ ___)(  _ \ / _\  / __)/ )( \(  __)(_  _)(_  _)(  )  / ___) / __) / _\ (  ( \ " |& tee -a  $report_path$hosts/$output.txt;
+	echo "\___ \ ) __//    \( (_ \) __ ( ) _)   )(    )(   )(   \___ \( (__ /    \/    /" |& tee -a  $report_path$hosts/$output.txt;
+	echo "(____/(__)  \_/\_/ \___/\_)(_/(____) (__)  (__) (__)  (____/ \___)\_/\_/\_)__)" |& tee -a  $report_path$hosts/$output.txt;
+	echo "" |& tee -a  $report_path$hosts/$output.txt;
+	python /$application_path$spaghetti_folder/spaghetti.py --url $hosts --scan 0 --random-agent --verbose  | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g" | sed "s/\x0f//g" |& tee -a  $report_path$hosts/$output.txt;
 	
 	#Show Report
-	x-www-browser $report_path$hosts/$output1.html 2> /dev/null &
-	x-www-browser $report_path$hosts/$output2.txt 2> /dev/null &
+	x-www-browser $report_path$hosts/$output.txt 2> /dev/null &
 	active_recon_interface
 	}
 
