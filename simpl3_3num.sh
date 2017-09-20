@@ -11,7 +11,7 @@
 
 
 #System
-declare -r app_version='BETA 2.0'
+declare -r app_version='BETA 2.1'
 
 
 #Auto Update Script
@@ -76,6 +76,9 @@ declare -r shocker_folder='shocker'
 declare -r massbleed_git='https://github.com/1N3/MassBleed.git'
 declare -r massbleed_folder='MassBleed'
 
+declare -r spaghetti_git='https://github.com/m4ll0k/Spaghetti.git'
+declare -r spaghetti_folder='Spaghetti'
+
 
 #AUTOINSTALL APPLICATION
 declare -a required_apps=("./$application_path$sniper_folder/sniper" 
@@ -84,6 +87,7 @@ declare -a required_apps=("./$application_path$sniper_folder/sniper"
 						"./$application_path$ssh_audit_folder/ssh-audit.py"
 						"./$application_path$shocker_folder/shocker.py"
 						"./$application_path$massbleed_folder/massbleed"
+						"./$application_path$spaghetti_folder/spaghetti.py"
 						)						
 
 #WORDLIST CONFIGURATION
@@ -217,6 +221,15 @@ function install_apps {
 		chmod +x $application_path$massbleed_folder/massbleed $application_path$massbleed_folder/heartbleed.py $application_path$massbleed_folder/winshock.sh $application_path$massbleed_folder/openssl_ccs.pl &> /dev/null
 		#Install apps
 		echo -e "$OKGREEN	[✔-OK!]::[Apps]: MassBleed $RESET"
+		;;
+	"./$application_path$spaghetti_folder/spaghetti.py")
+		#Download and install Spaghetti
+		install_message Spaghetti
+		install_git $spaghetti_git $spaghetti_folder
+		chmod +x $application_path$spaghetti_folder/spaghetti.py &> /dev/null
+		pip install -r $application_path$spaghetti_folder/requirements.txt
+		#Install apps
+		echo -e "$OKGREEN	[✔-OK!]::[Apps]: Spaghetti $RESET"
 		;;
 	*)
 		echo ""
@@ -618,13 +631,22 @@ function active_recon_nikto_module {
 	read protocols
 	echo -e "What is your host? e.g. www.example.com  \c"
 	read hosts
-	output="Nikto_Report"
+	output1="Nikto_Report"
 	rm -f $report_path$hosts/$output.html
 	mkdir -p $report_path$hosts 2> /dev/null
 	echo ""
-	nikto -h $protocols://$hosts -F htm -output $output.html
-	mv $output.html $report_path$hosts/$output.html
-	x-www-browser $report_path$hosts/$output.html 2> /dev/null &
+	
+	#Nikto_Scan
+	nikto -h $protocols://$hosts -F htm -output $output1.html
+	mv $output1.html $report_path$hosts/$output1.html 
+	
+	#Spaghetti_Scan
+	output2="Spaghetti_Report"
+	python /$application_path$spaghetti_folder/spaghetti.py --url $hosts --scan 0 --random-agent --verbose  | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g" | sed "s/\x0f//g" |& tee -a  $report_path$hosts/$output2.txt;
+	
+	#Show Report
+	x-www-browser $report_path$hosts/$output1.html 2> /dev/null &
+	x-www-browser $report_path$hosts/$output2.txt 2> /dev/null &
 	active_recon_interface
 	}
 
@@ -1043,7 +1065,7 @@ Select from the 'Active Reconnaisance' menu:
 	1  : Nmap - $OKORANGE Port Scanner $RESET $OKGREEN
 	2  : Domain Analyzer - $OKORANGE Top-Level Domain Analyzer $RESET $OKGREEN
 	3  : CutyCapt - $OKORANGE Capture Web Port Interface $RESET $OKGREEN
-	4  : Nikto - $OKORANGE Basic Vunerability Assessment Tool $RESET $OKGREEN
+	4  : Basic Vulnerability Scanner - $OKORANGE Basic VA Tool $RESET $OKGREEN
 	5  : WhatWeb - $OKORANGE CMS Identifier Module $RESET $OKGREEN
 	6  : LBD - $OKORANGE Load Balancer Detector $RESET $OKGREEN
 	7  : WAF Identifier - $OKORANGE Web Application Firewall Scanner $RESET $OKGREEN
