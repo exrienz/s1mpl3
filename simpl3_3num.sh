@@ -649,12 +649,10 @@ function active_recon_nikto_module {
 	#Show Report
 	while true;
 	do
-		read -r -p "Spaghetti scan cant be saved (for now), exit ? [y/n]" response   
+		read -r -p "Spaghetti scan cant be saved (for now), exit ? [y/n]  " response   
 		if [[ $response =~ ^([yY][eE][sS]|[yY])$ ]]
 		then
 			active_recon_interface
-		else
-			exit 0
 		fi
 	done
 	}
