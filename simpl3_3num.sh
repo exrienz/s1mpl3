@@ -11,7 +11,7 @@
 
 
 #System
-declare -r app_version='BETA 2.2'
+declare -r app_version='BETA 2.3'
 
 
 #Auto Update Script
@@ -641,19 +641,23 @@ function active_recon_nikto_module {
 	echo "/    / )(  )  (   )( (  O )  \___ \( (__ /    \/    / " |& tee -a  $report_path$hosts/$output.txt;
 	echo "\_)__)(__)(__\_) (__) \__/   (____/ \___)\_/\_/\_)__)" |& tee -a  $report_path$hosts/$output.txt;
 	echo "" |& tee -a  $report_path$hosts/$output.txt;
-	nikto -h $protocols://$hosts | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g" | sed "s/\x0f//g" |& tee -a  $report_path$hosts/$output.txt;
-	#Spaghetti Scan
-	echo "" |& tee -a  $report_path$hosts/$output.txt;
-	echo " ____  ____   __    ___  _  _  ____  ____  ____  __    ____   ___   __   __ _ " |& tee -a  $report_path$hosts/$output.txt;
-	echo "/ ___)(  _ \ / _\  / __)/ )( \(  __)(_  _)(_  _)(  )  / ___) / __) / _\ (  ( \ " |& tee -a  $report_path$hosts/$output.txt;
-	echo "\___ \ ) __//    \( (_ \) __ ( ) _)   )(    )(   )(   \___ \( (__ /    \/    /" |& tee -a  $report_path$hosts/$output.txt;
-	echo "(____/(__)  \_/\_/ \___/\_)(_/(____) (__)  (__) (__)  (____/ \___)\_/\_/\_)__)" |& tee -a  $report_path$hosts/$output.txt;
-	echo "" |& tee -a  $report_path$hosts/$output.txt;
-	python /$application_path$spaghetti_folder/spaghetti.py --url $hosts --scan 0 --random-agent --verbose  | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g" | sed "s/\x0f//g" |& tee -a  $report_path$hosts/$output.txt;
-	
-	#Show Report
+	nikto -h $protocols://$hosts |& tee -a |& tee -a  $report_path$hosts/$output.txt;
 	x-www-browser $report_path$hosts/$output.txt 2> /dev/null &
-	active_recon_interface
+	#Spaghetti Scan
+	python /$application_path$spaghetti_folder/spaghetti.py --url $hosts --scan 0 --random-agent --verbose
+	
+		
+	#Show Report
+	while true;
+	do
+		read -r -p "Spaghetti scan cant be saved (for now), exit ? [y/n]" response   
+		if [[ $response =~ ^([yY][eE][sS]|[yY])$ ]]
+		then
+			active_recon_interface
+		else
+			exit 0
+		fi
+	done
 	}
 
 #Load Balancer Detector Module	
