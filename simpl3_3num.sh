@@ -11,7 +11,7 @@
 
 
 #System
-declare -r app_version='BETA 2.3'
+declare -r app_version='BETA 2.5'
 
 
 #Auto Update Script
@@ -370,6 +370,7 @@ function pa_aio_site {
 
 	declare -a dorks=(" -url https://www.threatcrowd.org/domain.php?domain=$hosts"
 					" -url https://www.robtex.com/dns-lookup/$hosts"
+					" -url https://mxtoolbox.com/domain/$hosts/"
 					" -url http://www.dnsstuff.com/tools#dnsReport|type=domain&&value=$hosts"
 					" -url https://www.tcpiputils.com/browse/domain/$hosts"
 					" -url http://toolbar.netcraft.com/site_report?url=$hosts"
@@ -377,7 +378,7 @@ function pa_aio_site {
 					" -url https://www.censys.io/ipv4?q=$hosts"
 					" -url https://www.builtwith.com/$hosts"
 					" -url https://web.archive.org/web/*/$hosts"
-					" -url https://securityheaders.io/?q=$hosts"
+					" -url https://httpsecurityreport.com/?report=$hosts"
 					" -url https://www.openbugbounty.org/search/?search=$hosts&type=hosts"
 					" -url https://crt.sh/?q=$hosts"
 					" -url https://www.ssllabs.com/ssltest/analyze.html?d=$hosts&latest")
