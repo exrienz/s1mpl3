@@ -615,31 +615,28 @@ function active_recon_nikto_module {
 		read -r -p "Spaghetti scan cant be saved (for now), continue ? [y/n]  " response   
 		if [[ $response =~ ^([yY][eE][sS]|[yY])$ ]]
 		then
+			cd $home_path
+			echo ""
+	
+			#Striker Scan
+			echo ""
+			python $application_path$striker_folder/striker $hosts  |& tee -a  $report_path$hosts/$output.txt;
+			echo ""
+			
+			echo ""
+			#Nikto_Scan
+			echo " __ _  __  __ _  ____  __     ____   ___   __   __ _ " |& tee -a  $report_path$hosts/$output.txt;
+			echo "(  ( \(  )(  / )(_  _)/  \   / ___) / __) / _\ (  ( \ " |& tee -a  $report_path$hosts/$output.txt;
+			echo "/    / )(  )  (   )( (  O )  \___ \( (__ /    \/    / " |& tee -a  $report_path$hosts/$output.txt;
+			echo "\_)__)(__)(__\_) (__) \__/   (____/ \___)\_/\_/\_)__)" |& tee -a  $report_path$hosts/$output.txt;
+			echo "" |& tee -a  $report_path$hosts/$output.txt;
+			nikto -h $protocols://$hosts |& tee -a |& tee -a  $report_path$hosts/$output.txt;
+			echo "" |& tee -a  $report_path$hosts/$output.txt;
+			
+			x-www-browser $report_path$hosts/$output.txt 2> /dev/null  | &> /dev/null &
 			active_recon_interface
 		fi
-	done
-	cd $home_path
-	echo ""
-	
-	#Striker Scan
-	echo ""
-	python $application_path$striker_folder/striker $hosts  |& tee -a  $report_path$hosts/$output.txt;
-	echo ""
-	
-	echo ""
-	#Nikto_Scan
-	echo " __ _  __  __ _  ____  __     ____   ___   __   __ _ " |& tee -a  $report_path$hosts/$output.txt;
-	echo "(  ( \(  )(  / )(_  _)/  \   / ___) / __) / _\ (  ( \ " |& tee -a  $report_path$hosts/$output.txt;
-	echo "/    / )(  )  (   )( (  O )  \___ \( (__ /    \/    / " |& tee -a  $report_path$hosts/$output.txt;
-	echo "\_)__)(__)(__\_) (__) \__/   (____/ \___)\_/\_/\_)__)" |& tee -a  $report_path$hosts/$output.txt;
-	echo "" |& tee -a  $report_path$hosts/$output.txt;
-	nikto -h $protocols://$hosts |& tee -a |& tee -a  $report_path$hosts/$output.txt;
-	echo "" |& tee -a  $report_path$hosts/$output.txt;
-	
-	x-www-browser $report_path$hosts/$output.txt 2> /dev/null  | &> /dev/null &
-	
-	
-	
+	done	
 	}
 
 	
