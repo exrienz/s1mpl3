@@ -11,7 +11,7 @@
 
 
 #System
-declare -r app_version='BETA 2.7'
+declare -r app_version='BETA 2.8'
 
 
 #Auto Update Script
@@ -64,9 +64,6 @@ declare -r theHarvester_folder='theHarvester'
 declare -r domain_analyzer_git='https://github.com/eldraco/domain_analyzer.git'
 declare -r domain_analyzer_folder='domain_analyzer'
 
-declare -r sniper_git='https://github.com/1N3/Sn1per.git'
-declare -r sniper_folder='Sn1per'
-
 declare -r ssh_audit_git='https://github.com/arthepsy/ssh-audit.git'
 declare -r ssh_audit_folder='ssh-audit'
 
@@ -81,7 +78,7 @@ declare -r spaghetti_folder='Spaghetti'
 
 
 #AUTOINSTALL APPLICATION
-declare -a required_apps=("./$application_path$sniper_folder/sniper" 
+declare -a required_apps=(
 						"./$application_path$theHarvester_folder/theHarvester.py"
 						"./$application_path$domain_analyzer_folder/domain_analyzer.py"
 						"./$application_path$ssh_audit_folder/ssh-audit.py"
@@ -112,19 +109,24 @@ declare -a wordlist_path=("/usr/share/wordlists/wfuzz/general/common.txt"
 
 
 function apps_exist {
-	type "$1" | &> /dev/null ;
+	type "$1" &> /dev/null ;
 	}
 
 
 function install_git {
-	xterm -e "git clone $1 $application_path$2" | 2> /dev/null &
+	xterm -e "git clone $1 $application_path$2" &
 	wait
 	}
 
 	
 function install_message {
 	#Download and install nmap
-	echo -e "$OKGREEN	[-]::[Installing]: Downloading $1..Please Wait.... $RESET"
+	echo -e "[-]::[Installing]: Downloading $1..Please Wait...."
+	}
+
+function install_success {
+	#Download and install nmap
+	echo -e "[✔-Installation Success!]::[Apps]: $1 $RESET"
 	}
 
 	
@@ -160,43 +162,35 @@ function xml2htmlII () {
 #Check if Vulscan Script available
 if [ -e /usr/share/nmap/scripts/vulscan/vulscan.nse ]
 then
-    echo -e "$OKGREEN	[✔-OK!]::[Apps]: Vulscan Script Available $RESET"
+	echo -e "$OKGREEN"
+    echo -e "[✔-OK!]::[Apps]: Vulscan Script Available $RESET"
 else
-    echo -e "$OKRED	[x-Missing!]::[Apps]: Vulscan Script Not-Available $RESET"
+	echo -e "$OKRED"
+    echo -e "[x-Missing!]::[Apps]: Vulscan Script Not-Available $RESET"
 	mkdir -p /usr/share/nmap/scripts/vulscan 2> /dev/null
 	git clone https://github.com/scipag/vulscan.git /usr/share/nmap/scripts/vulscan	
-	echo -e "$OKGREEN	[✔-OK!]::[Apps]: Vulscan Script Available $RESET"
+	echo -e "$OKGREEN"
+	echo -e "[✔-OK!]::[Apps]: Vulscan Script Available $RESET"
 fi
 
 	
 #Install missing application
 function install_apps {
 	case "$1" in
-	"sniper")
-		#Download and install sn1per
-		install_message $1
-		install_git $sniper_git $sniper_folder
-		chmod 777 $application_path$sniper_folder/install.sh &> /dev/null
-		chmod 777 $application_path$sniper_folder/sniper &> /dev/null
-		gnome-terminal -x "./$application_path$sniper_folder/install.sh" | 2> /dev/null &
-		wait
-		#rm -r $application_path$sniper_folder
-		echo -e "$OKGREEN	[✔-OK!]::[Apps]: $1 $RESET"		
-		;;
 	"./$application_path$theHarvester_folder/theHarvester.py")
 		#Download and install theHarvester
 		install_message theHarvester
 		install_git $theHarvester_git $theHarvester_folder
 		#Install apps
 		chmod +x $application_path$theHarvester_folder/theHarvester.py &> /dev/null
-		echo -e "$OKGREEN	[✔-OK!]::[Apps]: theHarvester $RESET"
+		install_success theHarvester
 		;;
 	"./$application_path$domain_analyzer_folder/domain_analyzer.py")
 		#Download and install domain_analyzer
 		install_message domain_analyzer
 		install_git $domain_analyzer_git $domain_analyzer_folder
 		#Install apps
-		echo -e "$OKGREEN	[✔-OK!]::[Apps]: domain_analyzer $RESET"
+		install_success domain_analyzer
 		;;
 	"./$application_path$ssh_audit_folder/ssh-audit.py")
 		#Download and install ssh-audit
@@ -204,7 +198,7 @@ function install_apps {
 		install_git $ssh_audit_git $ssh_audit_folder
 		chmod +x $application_path$ssh_audit_folder/ssh-audit.py &> /dev/null
 		#Install apps
-		echo -e "$OKGREEN	[✔-OK!]::[Apps]: ssh-audit $RESET"
+		install_success ssh-audit
 		;;
 	"./$application_path$shocker_folder/shocker.py")
 		#Download and install shocker
@@ -212,7 +206,7 @@ function install_apps {
 		install_git $shocker_git $shocker_folder
 		chmod +x $application_path$shocker_folder/shocker.py &> /dev/null
 		#Install apps
-		echo -e "$OKGREEN	[✔-OK!]::[Apps]: Shocker $RESET"
+		install_success Shocker
 		;;
 	"./$application_path$massbleed_folder/massbleed")
 		#Download and install MassBleed
@@ -220,7 +214,7 @@ function install_apps {
 		install_git $massbleed_git $massbleed_folder
 		chmod +x $application_path$massbleed_folder/massbleed $application_path$massbleed_folder/heartbleed.py $application_path$massbleed_folder/winshock.sh $application_path$massbleed_folder/openssl_ccs.pl &> /dev/null
 		#Install apps
-		echo -e "$OKGREEN	[✔-OK!]::[Apps]: MassBleed $RESET"
+		install_success MassBleed
 		;;
 	"./$application_path$spaghetti_folder/spaghetti.py")
 		#Download and install Spaghetti
@@ -229,12 +223,13 @@ function install_apps {
 		chmod +x $application_path$spaghetti_folder/spaghetti.py &> /dev/null
 		pip install -r $application_path$spaghetti_folder/requirements.txt
 		#Install apps
-		echo -e "$OKGREEN	[✔-OK!]::[Apps]: Spaghetti $RESET"
+		install_success Spaghetti
 		;;
 	*)
-		echo ""
-		echo -e "$OKGREEN Enjoy! $RESET"
-		echo ""
+		# echo ""
+		# echo -e "$OKGREEN"
+		# echo -e "Enjoy! $RESET"
+		# echo ""
 		;;
 	esac	
 	}
@@ -707,13 +702,15 @@ function active_web_crawler_module {
 	
 	# echo -e "How deep you want to crawl? e.g. (Max:16)  \c"
 	# read depth
+	
+	
 	output="Web_Crawler"
-	mkdir -p $report_path$hosts  | 2> /dev/null &
+	mkdir -p $report_path$hosts  2> /dev/null
 	# echo ""
 	# skipfish -d $depth $the_cookies -o $report_path$hosts/$output $protocols://$hosts;
 	echo -e "$OKRED	[✔-OK!]::[Progress]: Crawling in progress..Please Wait! $RESET"
 	./$application_path$domain_analyzer_folder/crawler.py -u $hosts -s -m 100 | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g" | sed "s/\x0f//g"  >  $report_path$hosts/$output.txt;
-	x-www-browser $report_path$hosts/$output.txt  | 2> /dev/null &
+	x-www-browser $report_path$hosts/$output.txt | 2> /dev/null &
 	# x-www-browser $report_path$hosts/$output/index.html | 2> /dev/null &
 	active_recon_interface
 	}
@@ -1156,15 +1153,17 @@ Select from the 'Nmap command' menu:
 function setup {
 	main_logo
 	echo ""
-	echo -e "$OKRED [!]::[Check Dependencies]: $RESET"
-	echo ""
+	echo -e "$OKRED"
+	echo -e "[!]::[Checking Dependencies]: $RESET"
 
 		for i in "${required_apps[@]}"
 		do
 			if apps_exist $i ; then
-				echo -e "$OKGREEN	[✔-OK!]::[Apps]: $i $RESET"
+				echo -e "$OKGREEN"
+				echo -e "[✔-OK!]::[Apps]: $i $RESET"
 			else
-				echo -e "$OKRED	[x-Missing!]::[Apps]: $i $RESET"
+				echo -e "$OKRED"
+				echo -e "[x-Missing!]::[Apps]: $i $RESET $OKGREEN"
 				install_apps $i
 			fi
 		done
@@ -1191,4 +1190,3 @@ init
 #
 #
 #
-
