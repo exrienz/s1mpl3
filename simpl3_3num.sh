@@ -11,7 +11,7 @@
 
 
 #System
-declare -r app_version='BETA 2.8'
+declare -r app_version='BETA 2.9'
 
 
 #Auto Update Script
@@ -151,12 +151,12 @@ function wordlist (){
 function xml2html () {
 	xsltproc $report_path$1/$2.xml -o $report_path$1/$2.html | 2> /dev/null
 	rm $report_path$1/$2.xml | 2> /dev/null
-	x-www-browser $report_path$1/$2.html | 2> /dev/null &
+	x-www-browser $report_path$1/$2.html | &> /dev/null &
 	}
 
 function xml2htmlII () {
 	xsltproc $report_path$1/$2.xml -o $report_path$1/$2.html | 2> /dev/null
-	x-www-browser $report_path$1/$2.html | 2> /dev/null &
+	x-www-browser $report_path$1/$2.html | &> /dev/null &
 	}
 	
 #Check if Vulscan Script available
@@ -304,7 +304,7 @@ EOF
 function pa_whois(){
 	echo -e "What is your host? e.g. example.com  \c"
 	read hosts
-	x-www-browser --new-tab $pa_whois_url$hosts  | 2> /dev/null &
+	x-www-browser --new-tab $pa_whois_url$hosts  | &> /dev/null &
 	passive_recon_interface
 }
 
@@ -340,7 +340,7 @@ function pa_google_dork {
 					" -url https://www.google.com/search?q=inurl:'/phpinfo.php'+OR+inurl:'.htaccess'+OR+inurl:'/.git'+$hosts+-github"
 					)
 					
-		x-www-browser --new-tab ${dorks[@]} | 2> /dev/null &
+		x-www-browser --new-tab ${dorks[@]} | &> /dev/null &
 		
 		passive_recon_interface
 		;;
@@ -379,7 +379,7 @@ function pa_aio_site {
 					" -url https://crt.sh/?q=$hosts"
 					" -url https://www.ssllabs.com/ssltest/analyze.html?d=$hosts&latest")
 					
-		x-www-browser --new-tab ${dorks[@]} | 2> /dev/null &
+		x-www-browser --new-tab ${dorks[@]} | &> /dev/null &
 		
 		passive_recon_interface
 		;;
@@ -392,7 +392,7 @@ function pa_aio_site {
 	
 #Passive Online Tools
 function pa_online_tools {		
-	x-www-browser --new-tab -url "$1" | 2> /dev/null &
+	x-www-browser --new-tab -url "$1" | &> /dev/null &
 }
 
 
@@ -402,7 +402,7 @@ function pa_harvester {
 	read hosts
 	output="Email_Domain_Harvest_Report"
 	mkdir -p $report_path$hosts 2> /dev/null
-	xterm -e "python $application_path$theHarvester_folder/theHarvester.py -d $hosts -l 500 -b all -f $output.html; mv $output.html $report_path$hosts; rm -f $output.xml; x-www-browser --new-tab -url '$report_path/$hosts/$output.html'  | 2> /dev/null &" &
+	xterm -e "python $application_path$theHarvester_folder/theHarvester.py -d $hosts -l 500 -b all -f $output.html; mv $output.html $report_path$hosts; rm -f $output.xml; x-www-browser --new-tab -url '$report_path/$hosts/$output.html'  | &> /dev/null &" &
 	passive_recon_interface
 	}
 
@@ -437,7 +437,7 @@ function pa_gatling_gun {
 	# echo "Reverse IP Lookup============================================">> $report_path$hosts/$output.txt; 
 	# curl http://api.hackertarget.com/reverseiplookup/?q=$hosts >> $report_path$hosts/$output.txt; 
 	
-	x-www-browser --new-tab -url $report_path$hosts/$output.txt  | 2> /dev/null &
+	x-www-browser --new-tab -url $report_path$hosts/$output.txt  | &> /dev/null &
 	passive_recon_interface
 
 	}
@@ -564,7 +564,7 @@ function domain_analyzer_module {
 	mkdir -p $report_path$hosts 2> /dev/null
 	echo ""
 	./$application_path$domain_analyzer_folder/domain_analyzer.py -d $hosts -a -B | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g" | sed "s/\x0f//g" |& tee -a  $report_path$hosts/$output.txt;
-	x-www-browser $report_path$hosts/$output.txt 2> /dev/null  | 2> /dev/null &
+	x-www-browser $report_path$hosts/$output.txt 2> /dev/null  | &> /dev/null &
 	active_recon_interface
 }
 	
@@ -604,7 +604,7 @@ function active_recon_nikto_module {
 	# echo "" |& tee -a  $report_path$hosts/$output.txt;
 	# uniscan -u $hosts/ -qweds |& tee -a  $report_path$hosts/$output.txt;
 	# echo "" |& tee -a  $report_path$hosts/$output.txt;
-	x-www-browser $report_path$hosts/$output.txt 2> /dev/null  | 2> /dev/null &
+	x-www-browser $report_path$hosts/$output.txt 2> /dev/null  | &> /dev/null &
 	#Spaghetti Scan
 	echo ""
 	python $application_path$spaghetti_folder/spaghetti.py --url $hosts --scan 0 --random-agent --verbose
@@ -628,7 +628,7 @@ function active_recon_load_balancer_module {
 	mkdir -p $report_path$hosts 2> /dev/null
 	echo ""
 	lbd $hosts |& tee -a $report_path$hosts/$output.txt;
-	x-www-browser $report_path$hosts/$output.txt | 2> /dev/null &
+	x-www-browser $report_path$hosts/$output.txt | &> /dev/null &
 	active_recon_interface
 	}
 
@@ -640,7 +640,7 @@ function active_recon_wafw00f_module {
 	mkdir -p $report_path$hosts 2> /dev/null
 	echo ""
 	wafw00f $hosts |& tee -a $report_path$hosts/$output.txt;
-	x-www-browser $report_path$hosts/$output.txt | 2> /dev/null &
+	x-www-browser $report_path$hosts/$output.txt | &> /dev/null &
 	active_recon_interface
 	}
 
@@ -653,7 +653,7 @@ function active_cms_identifier_module {
 	mkdir -p $report_path$hosts 2> /dev/null
 	echo ""
 	whatweb -a 3 -v $hosts | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g" | sed "s/\x0f//g" |& tee -a  $report_path$hosts/$output.txt;
-	x-www-browser $report_path$hosts/$output.txt  | 2> /dev/null &
+	x-www-browser $report_path$hosts/$output.txt  | &> /dev/null &
 	active_recon_interface
 	}	
 
@@ -675,7 +675,7 @@ function active_recon_ssl_analyzer {
 	echo ""
 	testssl $hosts | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g" | sed "s/\x0f//g" |& tee -a  $report_path$hosts/$output.txt;
 	
-	x-www-browser $report_path$hosts/$output.txt  | 2> /dev/null &
+	x-www-browser $report_path$hosts/$output.txt  | &> /dev/null &
 	active_recon_interface
 }
 
@@ -710,8 +710,8 @@ function active_web_crawler_module {
 	# skipfish -d $depth $the_cookies -o $report_path$hosts/$output $protocols://$hosts;
 	echo -e "$OKRED	[✔-OK!]::[Progress]: Crawling in progress..Please Wait! $RESET"
 	./$application_path$domain_analyzer_folder/crawler.py -u $hosts -s -m 100 | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g" | sed "s/\x0f//g"  >  $report_path$hosts/$output.txt;
-	x-www-browser $report_path$hosts/$output.txt | 2> /dev/null &
-	# x-www-browser $report_path$hosts/$output/index.html | 2> /dev/null &
+	x-www-browser $report_path$hosts/$output.txt | &> /dev/null &
+	# x-www-browser $report_path$hosts/$output/index.html | &> /dev/null &
 	active_recon_interface
 	}
 	
@@ -778,7 +778,7 @@ function active_http_method_module {
 		read -p "Test again? Y/n " response 		
 		[[ ${#response} -eq 0 ]] && response='y'  
 	done 	
-	xdg-open $report_path$hosts/$output.txt  | 2> /dev/null &
+	xdg-open $report_path$hosts/$output.txt  | &> /dev/null &
 	active_recon_interface
 	}
 	
