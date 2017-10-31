@@ -11,7 +11,7 @@
 
 
 #System
-declare -r app_version='BETA 2.9'
+declare -r app_version='BETA 3.0'
 
 
 #Auto Update Script
@@ -22,6 +22,7 @@ SELF=$(basename $0)
 reldir=`dirname $0`
 cd $reldir
 default_directory=`pwd`
+home_path=$default_directory
 
 #Current LAN IP
 declare -r ip_local=$(ip -4 route get 8.8.8.8 | awk {'print $7'} | tr -d '\n')
@@ -61,6 +62,9 @@ declare -r pa_aio_view_dns_url_ii="http://www.gwebtools.com.br/"
 declare -r theHarvester_git='https://github.com/laramies/theHarvester.git'
 declare -r theHarvester_folder='theHarvester'
 
+declare -r striker_git='https://github.com/exrienz/Striker.git'
+declare -r striker_folder='Striker'
+
 declare -r domain_analyzer_git='https://github.com/eldraco/domain_analyzer.git'
 declare -r domain_analyzer_folder='domain_analyzer'
 
@@ -79,6 +83,7 @@ declare -r spaghetti_folder='Spaghetti'
 
 #AUTOINSTALL APPLICATION
 declare -a required_apps=(
+						"./$application_path$striker_folder/striker"
 						"./$application_path$theHarvester_folder/theHarvester.py"
 						"./$application_path$domain_analyzer_folder/domain_analyzer.py"
 						"./$application_path$ssh_audit_folder/ssh-audit.py"
@@ -177,6 +182,14 @@ fi
 #Install missing application
 function install_apps {
 	case "$1" in
+	"./$application_path$striker_folder/striker")
+		#Download and install theHarvester
+		install_message Striker
+		install_git $striker_git $striker_folder
+		#Install apps
+		chmod +x $application_path$striker_folder/striker &> /dev/null
+		install_success Striker
+		;;
 	"./$application_path$theHarvester_folder/theHarvester.py")
 		#Download and install theHarvester
 		install_message theHarvester
@@ -402,7 +415,7 @@ function pa_harvester {
 	read hosts
 	output="Email_Domain_Harvest_Report"
 	mkdir -p $report_path$hosts 2> /dev/null
-	xterm -e "python $application_path$theHarvester_folder/theHarvester.py -d $hosts -l 500 -b all -f $output.html; mv $output.html $report_path$hosts; rm -f $output.xml; x-www-browser --new-tab -url '$report_path/$hosts/$output.html'  | &> /dev/null &" &
+	xterm -e "python $application_path$theHarvester_folder/theHarvester.py -d $hosts -l 500 -b all |& tee -a  $report_path$hosts/$output.txt; x-www-browser --new-tab -url '$report_path/$hosts/$output.txt'  | &> /dev/null" &
 	passive_recon_interface
 	}
 
@@ -588,9 +601,31 @@ function active_recon_nikto_module {
 	read protocols
 	echo -e "What is your host? e.g. www.example.com  \c"
 	read hosts
-	output="Basic_Vulnerability_Report"
-	rm -f $report_path$hosts/$output.html
+	output="Common_Vulnerability_Report"
+	rm -f $report_path$hosts/$output.txt
 	mkdir -p $report_path$hosts 2> /dev/null
+	
+	#Spaghetti Scan
+	echo ""
+	cd $application_path$spaghetti_folder
+	python spaghetti.py --url $hosts --scan 0 --random-agent --verbose;
+	#Show Report
+	while true;
+	do
+		read -r -p "Spaghetti scan cant be saved (for now), continue ? [y/n]  " response   
+		if [[ $response =~ ^([yY][eE][sS]|[yY])$ ]]
+		then
+			active_recon_interface
+		fi
+	done
+	cd $home_path
+	echo ""
+	
+	#Striker Scan
+	echo ""
+	python $application_path$striker_folder/striker $hosts  |& tee -a  $report_path$hosts/$output.txt;
+	echo ""
+	
 	echo ""
 	#Nikto_Scan
 	echo " __ _  __  __ _  ____  __     ____   ___   __   __ _ " |& tee -a  $report_path$hosts/$output.txt;
@@ -600,26 +635,14 @@ function active_recon_nikto_module {
 	echo "" |& tee -a  $report_path$hosts/$output.txt;
 	nikto -h $protocols://$hosts |& tee -a |& tee -a  $report_path$hosts/$output.txt;
 	echo "" |& tee -a  $report_path$hosts/$output.txt;
-	#UniScan
-	# echo "" |& tee -a  $report_path$hosts/$output.txt;
-	# uniscan -u $hosts/ -qweds |& tee -a  $report_path$hosts/$output.txt;
-	# echo "" |& tee -a  $report_path$hosts/$output.txt;
+	
 	x-www-browser $report_path$hosts/$output.txt 2> /dev/null  | &> /dev/null &
-	#Spaghetti Scan
-	echo ""
-	python $application_path$spaghetti_folder/spaghetti.py --url $hosts --scan 0 --random-agent --verbose
-	echo ""
-	#Show Report
-	while true;
-	do
-		read -r -p "Spaghetti scan cant be saved (for now), exit ? [y/n]  " response   
-		if [[ $response =~ ^([yY][eE][sS]|[yY])$ ]]
-		then
-			active_recon_interface
-		fi
-	done
+	
+	
+	
 	}
 
+	
 #Load Balancer Detector Module	
 function active_recon_load_balancer_module {
 	echo -e "What is your host? e.g. www.example.com  \c"
