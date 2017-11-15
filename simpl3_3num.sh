@@ -586,6 +586,7 @@ function active_recon_nikto_module {
 	
 	while true;
 	do
+		echo ""
 		read -r -p "Spaghetti scan cant be saved (for now), continue ? [y/n]  " response   
 		if [[ $response =~ ^([yY][eE][sS]|[yY])$ ]]
 		then
@@ -1120,6 +1121,6 @@ function setup {
 #   | |  | | (_| | | | | |
 #   |_|  |_|\__,_|_|_| |_|
 #                         
-#                         
+                      
 setup
 init
