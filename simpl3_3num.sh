@@ -83,7 +83,7 @@ declare -r spaghetti_folder='Spaghetti'
 
 #AUTOINSTALL APPLICATION
 declare -a required_apps=(
-						"./$application_path$striker_folder/striker"
+						"./$application_path$striker_folder/striker.py"
 						"./$application_path$theHarvester_folder/theHarvester.py"
 						"./$application_path$domain_analyzer_folder/domain_analyzer.py"
 						"./$application_path$ssh_audit_folder/ssh-audit.py"
@@ -93,11 +93,13 @@ declare -a required_apps=(
 						)						
 
 #WORDLIST CONFIGURATION
-declare -a wordlist_path=("/usr/share/wordlists/wfuzz/general/common.txt"
+declare -a wordlist_path=(
+						"/usr/share/wordlists/wfuzz/general/common.txt"
 						"/usr/share/wordlists/wfuzz/general/medium.txt"
 						"/usr/share/wordlists/wfuzz/general/big.txt"
 						"/usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt"
-						"/usr/share/wordlists/fasttrack.txt")
+						"/usr/share/wordlists/fasttrack.txt"
+						)
 
 						
 						
@@ -125,12 +127,12 @@ function install_git {
 
 	
 function install_message {
-	#Download and install nmap
+	#Download and install apps
 	echo -e "[-]::[Installing]: Downloading $1..Please Wait...."
 	}
 
 function install_success {
-	#Download and install nmap
+	#Download and install success
 	echo -e "[✔-Installation Success!]::[Apps]: $1 $RESET"
 	}
 
@@ -574,6 +576,8 @@ function active_recon_nikto_module {
 	read protocols
 	echo -e "What is your host? e.g. www.example.com  \c"
 	read hosts
+	echo -e "What is your http port? \c"
+	read portz
 	output="Common_Vulnerability_Report"
 	rm -f $report_path$hosts/$output.txt
 	mkdir -p $report_path$hosts 2> /dev/null
@@ -599,6 +603,14 @@ function active_recon_nikto_module {
 			cat $report_path$hosts/temp_$output.txt | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g" | sed "s/\x0f//g" >  $report_path$hosts/$output.txt;
 			rm $report_path$hosts/temp_$output.txt
 			echo ""
+			
+			#Nmap HTTP Scan
+			echo ""
+			output="Nmap_Http_Enum_Scan_Report"
+			nmap -p $portz -sV --script=http-iis-webdav-vuln,http-vuln-*,http-phpmyadmin-dir-traversal,http-title,http-method-tamper,http-traceroute,http-waf-detect,http-waf-fingerprint,http-internal-ip-disclosure,http-server-header,whois-ip,http-exif-spider,http-headers,http-referer-checker,http-enum,http-open-redirect,http-phpself-xss,http-xssed,http-userdir-enum,http-sitemap-generator,http-svn-info,http-unsafe-output-escaping,http-default-accounts,http-aspnet-debug,http-php-version,http-cross-domain-policy,http-comments-displayer,http-backup-finder,http-auth-finder,http-apache-server-status,http-ls,http-mcmp,http-mobileversion-checker,http-robtex-shared-ns,http-rfi-spider,http-vhosts,firewalk --traceroute  $hosts -oX $report_path$hosts/$output.xml 2> /dev/null
+			xml2html $hosts $output
+			echo ""
+						
 			
 			echo ""
 			#Nikto_Scan
