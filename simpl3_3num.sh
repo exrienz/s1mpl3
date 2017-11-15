@@ -11,7 +11,7 @@
 
 
 #System
-declare -r app_version='BETA 3.1'
+declare -r app_version='BETA 3.2'
 
 
 #Auto Update Script
@@ -182,7 +182,7 @@ fi
 #Install missing application
 function install_apps {
 	case "$1" in
-	"./$application_path$striker_folder/striker")
+	"./$application_path$striker_folder/striker.py")
 		#Download and install theHarvester
 		install_message Striker
 		install_git $striker_git $striker_folder
@@ -1121,6 +1121,6 @@ function setup {
 #   | |  | | (_| | | | | |
 #   |_|  |_|\__,_|_|_| |_|
 #                         
-                      
+#                         
 setup
 init
