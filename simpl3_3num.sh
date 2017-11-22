@@ -430,7 +430,7 @@ function pa_harvester {
 	read hosts
 	output="Email_Domain_Harvest_Report"
 	mkdir -p $report_path$hosts 2> /dev/null
-	xterm -e "python $application_path$theHarvester_folder/theHarvester.py -d $hosts -l 500 -b all |& tee -a  $report_path$hosts/$output.txt; x-www-browser --new-tab -url '$report_path/$hosts/$output.txt'  | &> /dev/null" &
+	xterm -e "echo 'The Harvester was running in background...Please wait...' && python $application_path$theHarvester_folder/theHarvester.py -d $hosts -l 500 -b all |& tee -a  $report_path$hosts/$output.txt; x-www-browser --new-tab -url '$report_path/$hosts/$output.txt'  | &> /dev/null" &
 	passive_recon_interface
 	}
 
@@ -444,7 +444,7 @@ function pa_gatling_gun {
 	mkdir -p $report_path$hosts 2> /dev/null
 	#rm $report_path$hosts/$output.txt 2> /dev/null	# Remove if exist
 	echo
-	echo "Whois Info============================================">> $report_path$hosts/$output.txt;
+	echo "Whois Info============================================"> $report_path$hosts/$output.txt;
 	curl http://api.hackertarget.com/whois/?q=$hosts >> $report_path$hosts/$output.txt;echo >> $report_path$hosts/$output.txt;echo >> $report_path$hosts/$output.txt;
 	echo "Search Host============================================">> $report_path$hosts/$output.txt; 
 	curl http://api.hackertarget.com/hostsearch/?q=$hosts >> $report_path$hosts/$output.txt;echo >> $report_path$hosts/$output.txt;echo >> $report_path$hosts/$output.txt;
@@ -687,7 +687,7 @@ function active_recon_ssl_analyzer {
 	output="SSL_report"
 	mkdir -p $report_path$hosts 2> /dev/null
 	echo ""
-	sslyze --resum --certinfo=basic --compression --reneg --sslv2 --sslv3 --hide_rejected_ciphers $hosts | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g" | sed "s/\x0f//g" |& tee -a  $report_path$hosts/$output.txt;
+	sslyze --resum --certinfo=basic --compression --reneg --sslv2 --sslv3 --hide_rejected_ciphers $hosts | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g" | sed "s/\x0f//g" |& tee  $report_path$hosts/$output.txt;
 	echo ""
 	echo "==================================================================================================">> $report_path$hosts/$output.txt;
 	echo ""
@@ -704,44 +704,19 @@ function active_recon_ssl_analyzer {
 
 #Skipfish web crawler
 function active_web_crawler_module {
-	# echo -e "Http or Https? \c"
-	# read protocols
 	echo -e "What is your host? e.g. www.example.com  \c"
 	read hosts
-	# echo -e "Got Cookies? [y/n] \c"
-	# read auth_cookies
-	
-	# case "$auth_cookies" in
-	# "y")
-		# echo -e "Insert The Cookie Values \c"
-		# read cookies_value
-		# the_cookies="-C name=$cookies_value"
-		# ;;
-	# *)
-		# the_cookies=""
-		# ;;
-	# esac
-	
-	# echo -e "How deep you want to crawl? e.g. (Max:16)  \c"
-	# read depth
-	
-	
 	output="Web_Crawler"
 	mkdir -p $report_path$hosts  2> /dev/null
-	# echo ""
-	# skipfish -d $depth $the_cookies -o $report_path$hosts/$output $protocols://$hosts;
 	echo -e "$OKRED	[✔-OK!]::[Progress]: Crawling in progress..Please Wait! $RESET"
-	./$application_path$domain_analyzer_folder/crawler.py -u $hosts -s -m 100 | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g" | sed "s/\x0f//g"  >  $report_path$hosts/$output.txt;
+	./$application_path$domain_analyzer_folder/crawler.py -u $hosts -s -m 100 | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g" | sed "s/\x0f//g"  |& tee  $report_path$hosts/$output.txt;
 	x-www-browser $report_path$hosts/$output.txt | &> /dev/null &
-	# x-www-browser $report_path$hosts/$output/index.html | &> /dev/null &
 	active_recon_interface
 	}
 	
 	
 #Dirb Module
 function active_brute_dir_module {
-	# xterm -e "dirbuster" &
-	# active_recon_interface
 	echo -e "Http or Https? \c"
 	read protocols
 	echo -e "What is your host? e.g. www.example.com  \c"
