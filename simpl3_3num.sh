@@ -11,7 +11,7 @@
 
 
 #System
-declare -r app_version='BETA 3.2'
+declare -r app_version='BETA 3.4'
 
 
 #Auto Update Script
@@ -80,6 +80,9 @@ declare -r massbleed_folder='MassBleed'
 declare -r spaghetti_git='https://github.com/exrienz/Spaghetti.git'
 declare -r spaghetti_folder='Spaghetti'
 
+declare -r anonym8_git='https://github.com/HiroshiManRise/anonym8.git'
+declare -r anonym8_folder='anonym8'
+
 
 #AUTOINSTALL APPLICATION
 declare -a required_apps=(
@@ -90,6 +93,7 @@ declare -a required_apps=(
 						"./$application_path$shocker_folder/shocker.py"
 						"./$application_path$massbleed_folder/massbleed"
 						"./$application_path$spaghetti_folder/spaghetti.py"
+						"anonym8"
 						)						
 
 #WORDLIST CONFIGURATION
@@ -239,6 +243,15 @@ function install_apps {
 		pip install -r $application_path$spaghetti_folder/requirements.txt
 		#Install apps
 		install_success Spaghetti
+		;;
+	"anonym8")
+		#Download and install Anonym8
+		install_message Anonym8
+		install_git $anonym8_git $anonym8_folder
+		chmod +x $application_path$anonym8_folder/INSTALL.sh &> /dev/null
+		xterm -e "./$application_path$anonym8_folder/INSTALL.sh"
+		#Install apps
+		install_success Anonym8
 		;;
 	*)
 		# echo ""
@@ -607,7 +620,7 @@ function active_recon_nikto_module {
 			#Nmap HTTP Scan
 			echo ""
 			output="Nmap_Http_Enum_Scan_Report"
-			nmap -p $portz -sV --script=http-iis-webdav-vuln,http-vuln-*,http-phpmyadmin-dir-traversal,http-title,http-method-tamper,http-traceroute,http-waf-detect,http-waf-fingerprint,http-internal-ip-disclosure,http-server-header,whois-ip,http-exif-spider,http-headers,http-referer-checker,http-enum,http-open-redirect,http-phpself-xss,http-xssed,http-userdir-enum,http-sitemap-generator,http-svn-info,http-unsafe-output-escaping,http-default-accounts,http-aspnet-debug,http-php-version,http-cross-domain-policy,http-comments-displayer,http-backup-finder,http-auth-finder,http-apache-server-status,http-ls,http-mcmp,http-mobileversion-checker,http-robtex-shared-ns,http-rfi-spider,http-vhosts,firewalk --traceroute  $hosts -oX $report_path$hosts/$output.xml 2> /dev/null
+			nmap -p $portz -sV -sS --script=http-iis-webdav-vuln,http-vuln-*,http-phpmyadmin-dir-traversal,http-title,http-method-tamper,http-traceroute,http-waf-detect,http-waf-fingerprint,http-internal-ip-disclosure,http-server-header,whois-ip,http-exif-spider,http-headers,http-referer-checker,http-enum,http-open-redirect,http-phpself-xss,http-xssed,http-userdir-enum,http-sitemap-generator,http-svn-info,http-unsafe-output-escaping,http-default-accounts,http-aspnet-debug,http-php-version,http-cross-domain-policy,http-comments-displayer,http-backup-finder,http-auth-finder,http-apache-server-status,http-ls,http-mcmp,http-mobileversion-checker,http-robtex-shared-ns,http-rfi-spider,http-vhosts,firewalk --traceroute  $hosts -oX $report_path$hosts/$output.xml 2> /dev/null
 			xml2html $hosts $output
 			echo ""
 						
@@ -822,9 +835,18 @@ function main_logo {
 # Main Function --------------------------------------------------------------------------------------------------------
 function init {
 	main_logo
+	
+	if [[ $(anonym8 status | grep "active (exited)") ]]; then
+		start_anonym="Disable Anonymous"
+	else
+		start_anonym="Enable Anonymous"
+	fi
+	
+	#Anonymous module
+	
 	echo -e "$OKGREEN
 [+]       Coded BY Muzaffar Mohamed       [+] 
-[-]           coco.oligococo.tk           [-]
+[-]           https://www.oligo.tk        [-]
 [-]       	    Local IP:         	  [-]$RESET $OKORANGE
 [-]             $ip_local      	  [-]$RESET $OKGREEN  
 
@@ -832,6 +854,7 @@ Select from the menu:
 	
 	1 : Passive Reconnaisance
 	2 : Active Reconnaisance
+	3 : $start_anonym
 	9 : Update $SELF script
 	
 	99: Exit
@@ -848,7 +871,20 @@ Select from the menu:
 		active_recon_interface
 		;;
 	"3")
-		search_common_exploit
+		case "$start_anonym" in
+			"Enable Anonymous") 
+				anonym8 start
+				init
+				;;
+			"Disable Anonymous") 
+				anonym8 stop
+				init
+				;;
+			*)
+				init
+				;;
+		esac
+
 		;;
 	"9")
 		runSelfUpdate
@@ -865,7 +901,7 @@ function passive_recon_interface {
 	main_logo
 	echo -e "$OKGREEN
 [+]       Coded BY Muzaffar Mohamed       [+] 
-[-]           coco.oligococo.tk           [-]
+[-]           https://www.oligo.tk        [-]
 [-]       	    Local IP:         	  [-]$RESET $OKORANGE
 [-]             $ip_local      	  [-]$RESET $OKGREEN  
 
@@ -921,7 +957,7 @@ function passive_recon_online_tools_interface {
 	main_logo
 	echo -e "$OKGREEN
 [+]       Coded BY Muzaffar Mohamed       [+] 
-[-]           coco.oligococo.tk           [-]
+[-]           https://www.oligo.tk        [-]
 [-]       	    Local IP:         	  [-]$RESET $OKORANGE
 [-]             $ip_local      	  [-]$RESET $OKGREEN  
 
@@ -988,7 +1024,7 @@ function active_recon_interface {
 	main_logo
 	echo -e "$OKGREEN
 [+]       Coded BY Muzaffar Mohamed       [+] 
-[-]           coco.oligococo.tk           [-]
+[-]           https://www.oligo.tk        [-]
 [-]       	    Local IP:         	  [-]$RESET $OKORANGE
 [-]             $ip_local      	  [-]$RESET $OKGREEN  
 
@@ -1069,7 +1105,7 @@ function active_recon_nmap_interface {
 	main_logo
 	echo -e "$OKGREEN
 [+]       Coded BY Muzaffar Mohamed       [+] 
-[-]           coco.oligococo.tk           [-]
+[-]           https://www.oligo.tk        [-]
 [-]       	    Local IP:         	  [-]$RESET $OKORANGE
 [-]             $ip_local      	  [-]$RESET $OKGREEN  
 
@@ -1125,6 +1161,7 @@ function setup {
 			fi
 		done
 		}
+
 		
 #    __  __       _       
 #   |  \/  |     (_)      
