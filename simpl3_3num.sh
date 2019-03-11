@@ -834,9 +834,6 @@ Select from the menu:
 	"2")
 		active_recon_interface
 		;;
-		esac
-
-		;;
 	"9")
 		runSelfUpdate
 		;;
