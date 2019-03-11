@@ -11,7 +11,7 @@
 
 
 #System
-declare -r app_version='BETA 3.4'
+declare -r app_version='BETA 3.5'
 
 
 #Auto Update Script
@@ -806,6 +806,7 @@ function init {
 	echo -e "$OKGREEN
 [+]       Coded BY Muzaffar Mohamed       [+] 
 [-]           https://www.oligo.tk        [-]
+[-]           Version: $app_version        [-]
 [-]       	    Local IP:         	  [-]$RESET $OKORANGE
 [-]             $ip_local      	  [-]$RESET $OKGREEN  
 
