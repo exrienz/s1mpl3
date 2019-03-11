@@ -93,7 +93,6 @@ declare -a required_apps=(
 						"./$application_path$shocker_folder/shocker.py"
 						"./$application_path$massbleed_folder/massbleed"
 						"./$application_path$spaghetti_folder/spaghetti.py"
-						"anonym8"
 						)						
 
 #WORDLIST CONFIGURATION
@@ -243,15 +242,6 @@ function install_apps {
 		pip install -r $application_path$spaghetti_folder/requirements.txt
 		#Install apps
 		install_success Spaghetti
-		;;
-	"anonym8")
-		#Download and install Anonym8
-		install_message Anonym8
-		install_git $anonym8_git $anonym8_folder
-		chmod +x $application_path$anonym8_folder/INSTALL.sh &> /dev/null
-		xterm -e "./$application_path$anonym8_folder/INSTALL.sh"
-		#Install apps
-		install_success Anonym8
 		;;
 	*)
 		# echo ""
