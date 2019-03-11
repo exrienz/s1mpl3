@@ -819,7 +819,6 @@ Select from the menu:
 	
 	1 : Passive Reconnaisance
 	2 : Active Reconnaisance
-	3 : $start_anonym
 	9 : Update $SELF script
 	
 	99: Exit
@@ -835,19 +834,6 @@ Select from the menu:
 	"2")
 		active_recon_interface
 		;;
-	"3")
-		case "$start_anonym" in
-			"Enable Anonymous") 
-				anonym8 start
-				init
-				;;
-			"Disable Anonymous") 
-				anonym8 stop
-				init
-				;;
-			*)
-				init
-				;;
 		esac
 
 		;;
