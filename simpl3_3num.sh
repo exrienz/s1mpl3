@@ -801,12 +801,6 @@ function main_logo {
 function init {
 	main_logo
 	
-	if [[ $(anonym8 status | grep "active (exited)") ]]; then
-		start_anonym="Disable Anonymous"
-	else
-		start_anonym="Enable Anonymous"
-	fi
-	
 	#Anonymous module
 	
 	echo -e "$OKGREEN
