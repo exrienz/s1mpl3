@@ -13,6 +13,8 @@
 #System
 declare -r app_version='BETA 3.5'
 
+#Install missing 
+apt-get install xterm -y
 
 #Auto Update Script
 set -o errexit
@@ -93,6 +95,7 @@ declare -a required_apps=(
 						"./$application_path$shocker_folder/shocker.py"
 						"./$application_path$massbleed_folder/massbleed"
 						"./$application_path$spaghetti_folder/spaghetti.py"
+						"/usr/bin/xterm"
 						)						
 
 #WORDLIST CONFIGURATION
@@ -173,10 +176,10 @@ function xml2htmlII () {
 if [ -e /usr/share/nmap/scripts/vulscan/vulscan.nse ]
 then
 	echo -e "$OKGREEN"
-    echo -e "[✔-OK!]::[Apps]: Vulscan Script Available $RESET"
+	echo -e "[✔-OK!]::[Apps]: Vulscan Script Available $RESET"
 else
 	echo -e "$OKRED"
-    echo -e "[x-Missing!]::[Apps]: Vulscan Script Not-Available $RESET"
+	echo -e "[x-Missing!]::[Apps]: Vulscan Script Not-Available $RESET"
 	mkdir -p /usr/share/nmap/scripts/vulscan 2> /dev/null
 	git clone https://github.com/scipag/vulscan.git /usr/share/nmap/scripts/vulscan	
 	echo -e "$OKGREEN"
@@ -187,6 +190,13 @@ fi
 #Install missing application
 function install_apps {
 	case "$1" in
+	"/usr/bin/xterm")
+		#Download and install xterm
+		install_message xterm
+		apt-get install xterm -y
+		#Install apps
+		install_success xterm
+		;;
 	"./$application_path$striker_folder/striker.py")
 		#Download and install theHarvester
 		install_message Striker
