@@ -82,9 +82,6 @@ declare -r massbleed_folder='MassBleed'
 declare -r spaghetti_git='https://github.com/exrienz/Spaghetti.git'
 declare -r spaghetti_folder='Spaghetti'
 
-declare -r anonym8_git='https://github.com/HiroshiManRise/anonym8.git'
-declare -r anonym8_folder='anonym8'
-
 
 #AUTOINSTALL APPLICATION
 declare -a required_apps=(
@@ -93,7 +90,7 @@ declare -a required_apps=(
 						"./$application_path$domain_analyzer_folder/domain_analyzer.py"
 						"./$application_path$ssh_audit_folder/ssh-audit.py"
 						"./$application_path$shocker_folder/shocker.py"
-						"./$application_path$massbleed_folder/massbleed"
+						"./$application_path$massbleed_folder/massbleed.sh"
 						"./$application_path$spaghetti_folder/spaghetti.py"
 						"/usr/bin/xterm"
 						)						
