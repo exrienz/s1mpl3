@@ -11,7 +11,7 @@
 
 
 #System
-declare -r app_version='BETA 3.5'
+declare -r app_version='BETA 3.6'
 
 #Install missing 
 apt-get install xterm -y
@@ -93,6 +93,7 @@ declare -a required_apps=(
 						"./$application_path$massbleed_folder/massbleed.sh"
 						"./$application_path$spaghetti_folder/spaghetti.py"
 						"/usr/bin/xterm"
+						"/usr/local/bin/nuclei"
 						)						
 
 #WORDLIST CONFIGURATION
@@ -249,6 +250,13 @@ function install_apps {
 		pip install -r $application_path$spaghetti_folder/requirements.txt
 		#Install apps
 		install_success Spaghetti
+		;;
+	"/usr/local/bin/nuclei")
+		#Download and install nuclei
+		install_message nuclei
+		go install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
+		#Install apps
+		install_success nuclei
 		;;
 	*)
 		# echo ""
@@ -663,6 +671,18 @@ function active_recon_wafw00f_module {
 	active_recon_interface
 	}
 
+#Nuclei Identifier Module
+function active_recon_nuclei_module {
+	echo -e "What is your host? e.g. www.example.com  \c"
+	read hosts
+	output="Nuclei_report"
+	mkdir -p $report_path$hosts 2> /dev/null
+	echo ""
+	nuclei -u $hosts -t /root/nuclei-templates/ -o $report_path$hosts/$output.txt;
+	x-www-browser $report_path$hosts/$output.txt | &> /dev/null &
+	active_recon_interface
+	}
+
 
 #CMS Identifier Module
 function active_cms_identifier_module {
@@ -986,12 +1006,13 @@ Select from the 'Active Reconnaisance' menu:
 	5  : WhatWeb - $OKORANGE CMS Identifier Module $RESET $OKGREEN
 	6  : LBD - $OKORANGE Load Balancer Detector $RESET $OKGREEN
 	7  : WAF Identifier - $OKORANGE Web Application Firewall Scanner $RESET $OKGREEN
-	8  : SSL Analyzer - $OKORANGE Analyze SSL Security $RESET $OKGREEN
-	9  : Web Spider - $OKORANGE Simple Web Crawler $RESET $OKGREEN
-	10 : Dirbuster - $OKORANGE Hidden Web Directory Bruteforcer $RESET $OKGREEN
-	11 : HTTP Method Analyzer - $OKORANGE Http Method Analyzer $RESET $OKGREEN
-	12 : Armitage - $OKORANGE GUI Based Metasploit $RESET $OKGREEN
-	13 : Burpsuite - $OKORANGE Proxy-based WAPT Framework $RESET $OKGREEN
+	8  : Nuclei - $OKORANGE Template Based Vulnerability Scanner $RESET $OKGREEN
+	9  : SSL Analyzer - $OKORANGE Analyze SSL Security $RESET $OKGREEN
+	10 : Web Spider - $OKORANGE Simple Web Crawler $RESET $OKGREEN
+	11 : Dirbuster - $OKORANGE Hidden Web Directory Bruteforcer $RESET $OKGREEN
+	12 : HTTP Method Analyzer - $OKORANGE Http Method Analyzer $RESET $OKGREEN
+	13 : Armitage - $OKORANGE GUI Based Metasploit $RESET $OKGREEN
+	14 : Burpsuite - $OKORANGE Proxy-based WAPT Framework $RESET $OKGREEN
 	
 	99 : Return		
 	$RESET"
@@ -1022,22 +1043,25 @@ Select from the 'Active Reconnaisance' menu:
 		active_recon_wafw00f_module
 		;;
 	"8")
-		active_recon_ssl_analyzer
+		active_recon_nuclei_module
 		;;
 	"9")
-		active_web_crawler_module
+		active_recon_ssl_analyzer
 		;;
 	"10")
-		active_brute_dir_module
+		active_web_crawler_module
 		;;
 	"11")
-		active_http_method_module
+		active_brute_dir_module
 		;;
 	"12")
+		active_http_method_module
+		;;
+	"13")
 		xterm -e "service postgresql start && armitage" &
 		active_recon_interface
 		;;
-	"13")
+	"14")
 		xterm -e "burpsuite" &
 		active_recon_interface
 		;;
