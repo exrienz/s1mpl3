@@ -13,8 +13,6 @@
 #System
 declare -r app_version='BETA 3.6'
 
-#Install missing 
-apt-get install xterm -y
 
 #Auto Update Script
 set -o errexit
@@ -45,7 +43,6 @@ declare -r port_analysis_path='Port_Analysis/'
 declare -r bin_path='/usr/local/bin'
 
 #URL VARIABLE
-declare -r pa_whois_url="http://whois.domaintools.com/"
 declare -r pa_nmap_url="https://suip.biz/?act=nmap"
 declare -r pa_hosmap_url="https://suip.biz/?act=hostmap"
 declare -r pa_nikto_url="https://suip.biz/?act=nikto"
@@ -53,10 +50,10 @@ declare -r pa_whatsweb_url="https://suip.biz/?act=whatweb"
 declare -r pa_wpscan_url="https://suip.biz/?act=wpscan"
 declare -r pa_droopescan_url="https://suip.biz/?act=droopescan"
 declare -r pa_sqlmap_url="https://suip.biz/?act=sqlmap"
-declare -r pa_aio_url="http://pentest-tools.security-audit.com/test/index.php"
+declare -r pa_aio_url="https://pentest-tools.com/"
 declare -r pa_dnsdumpster_url="https://dnsdumpster.com/"
 declare -r pa_aio_view_dns_url_i="http://viewdns.info/"
-declare -r pa_aio_view_dns_url_ii="http://www.gwebtools.com.br/"
+declare -r pa_aio_view_dns_url_ii="https://hackertarget.com/"
 
 
 #APPLICATION SETTING
@@ -64,7 +61,7 @@ declare -r pa_aio_view_dns_url_ii="http://www.gwebtools.com.br/"
 declare -r theHarvester_git='https://github.com/laramies/theHarvester.git'
 declare -r theHarvester_folder='theHarvester'
 
-declare -r striker_git='https://github.com/exrienz/Striker.git'
+declare -r striker_git='https://github.com/s0md3v/Striker.git'
 declare -r striker_folder='Striker'
 
 declare -r domain_analyzer_git='https://github.com/eldraco/domain_analyzer.git'
@@ -79,8 +76,6 @@ declare -r shocker_folder='shocker'
 declare -r massbleed_git='https://github.com/1N3/MassBleed.git'
 declare -r massbleed_folder='MassBleed'
 
-declare -r spaghetti_git='https://github.com/exrienz/Spaghetti.git'
-declare -r spaghetti_folder='Spaghetti'
 
 
 #AUTOINSTALL APPLICATION
@@ -91,8 +86,6 @@ declare -a required_apps=(
 						"./$application_path$ssh_audit_folder/ssh-audit.py"
 						"./$application_path$shocker_folder/shocker.py"
 						"./$application_path$massbleed_folder/massbleed.sh"
-						"./$application_path$spaghetti_folder/spaghetti.py"
-						"/usr/bin/xterm"
 						"/usr/local/bin/nuclei"
 						)						
 
@@ -125,7 +118,7 @@ function apps_exist {
 
 
 function install_git {
-	xterm -e "git clone $1 $application_path$2" &
+	git clone $1 $application_path$2 &
 	wait
 	}
 
@@ -188,13 +181,6 @@ fi
 #Install missing application
 function install_apps {
 	case "$1" in
-	"/usr/bin/xterm")
-		#Download and install xterm
-		install_message xterm
-		apt-get install xterm -y
-		#Install apps
-		install_success xterm
-		;;
 	"./$application_path$striker_folder/striker.py")
 		#Download and install theHarvester
 		install_message Striker
@@ -242,19 +228,17 @@ function install_apps {
 		#Install apps
 		install_success MassBleed
 		;;
-	"./$application_path$spaghetti_folder/spaghetti.py")
-		#Download and install Spaghetti
-		install_message Spaghetti
-		install_git $spaghetti_git $spaghetti_folder
-		chmod +x $application_path$spaghetti_folder/spaghetti.py &> /dev/null
-		pip install -r $application_path$spaghetti_folder/requirements.txt
-		#Install apps
-		install_success Spaghetti
-		;;
 	"/usr/local/bin/nuclei")
 		#Download and install nuclei
 		install_message nuclei
-		go install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
+		if ! command -v go &> /dev/null
+		then
+			echo "Go is not installed. Please install go to use nuclei."
+			echo "Please run the following command to install go:"
+			echo "apt-get install golang-go"
+		else
+			go install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
+		fi
 		#Install apps
 		install_success nuclei
 		;;
@@ -333,13 +317,6 @@ EOF
 #                                                           
 
 
-#Passive Enumeration Whois
-function pa_whois(){
-	echo -e "What is your host? e.g. example.com  \c"
-	read hosts
-	x-www-browser --new-tab $pa_whois_url$hosts  | &> /dev/null &
-	passive_recon_interface
-}
 
 
 #Passive Google Dorks
@@ -435,7 +412,7 @@ function pa_harvester {
 	read hosts
 	output="Email_Domain_Harvest_Report"
 	mkdir -p $report_path$hosts 2> /dev/null
-	xterm -e "echo 'The Harvester was running in background...Please wait...' && python $application_path$theHarvester_folder/theHarvester.py -d $hosts -l 500 -b all |& tee -a  $report_path$hosts/$output.txt; x-www-browser --new-tab -url '$report_path/$hosts/$output.txt'  | &> /dev/null" &
+	echo 'The Harvester is running in the background...Please wait...' && python3 $application_path$theHarvester_folder/theHarvester.py -d $hosts -l 500 -b all |& tee -a  $report_path$hosts/$output.txt &
 	passive_recon_interface
 	}
 
@@ -518,7 +495,7 @@ function nmap_module {
 	
 	mkdir -p $report_path$hosts 2> /dev/null
 	output="Nmap_OS_and_Service_Scan_Report"
-	nmap -sS -Pn -sV $vulscan_value --script "default or safe",firewalk  $hosts -oX $report_path$hosts/$output.xml 2> /dev/null
+	nmap -sV -sS $vulscan_value --script "default,safe,firewalk"  $hosts -oX $report_path$hosts/$output.xml 2> /dev/null
 	xml2htmlII $hosts $output
 	active_recon_nmap_interface
 	}
@@ -530,7 +507,7 @@ function nmap_stealth_module {
 	read hosts
 	mkdir -p $report_path$hosts 2> /dev/null
 	output="Nmap_Stealth_Scan_Report"
-	nmap --mtu 24 -A -sV  $hosts -oX $report_path$hosts/$output.xml 2> /dev/null
+	nmap -sS -A -sV  $hosts -oX $report_path$hosts/$output.xml 2> /dev/null
 	xml2html $hosts $output
 	active_recon_nmap_interface
 	}		
@@ -542,7 +519,7 @@ function nmap_udp_module {
 	read hosts
 	mkdir -p $report_path$hosts 2> /dev/null
 	output="Nmap_UDP_Scan_Report"
-	nmap -sU $hosts --script=banner -oX $report_path$hosts/$output.xml 2> /dev/null
+	nmap -sU --script banner $hosts -oX $report_path$hosts/$output.xml 2> /dev/null
 	xml2html $hosts $output
 	active_recon_nmap_interface
 	}
@@ -556,7 +533,7 @@ function nmap_email_enumerator_module {
 	read port
 	mkdir -p $report_path$hosts 2> /dev/null
 	output="Nmap_email_enumerator_Report"
-	nmap -p $port $hosts --script http-grep --script-args='match="[A-Za-z0-9%.%%%+%-]+@[A-Za-z0-9%.%%%+%-]+%.%w%w%w?%w?",breakonmatch' -oX $report_path$hosts/$output.xml
+	nmap -p $port --script http-grep --script-args 'match="[A-Za-z0-9%.%+%-]+@[A-Za-z0-9%.%+%-]+%.%w%w%w?%w?",breakonmatch' $hosts -oX $report_path$hosts/$output.xml
 	xml2html $hosts $output
 	active_recon_nmap_interface
 	}
@@ -600,24 +577,10 @@ function active_recon_nikto_module {
 	rm -f $report_path$hosts/$output.txt
 	mkdir -p $report_path$hosts 2> /dev/null
 	
-	#Spaghetti Scan
-	echo ""
-	cd $application_path$spaghetti_folder
-	python spaghetti.py --url $hosts --scan 0 --random-agent --verbose;
-	cd $home_path
-	
-	while true;
-	do
-		echo ""
-		read -r -p "Spaghetti scan cant be saved (for now), continue ? [y/n]  " response   
-		if [[ $response =~ ^([yY][eE][sS]|[yY])$ ]]
-		then
-			echo ""
-	
 			#Striker Scan
 			echo ""
 			
-			python $application_path$striker_folder/striker.py $hosts |& tee -a $report_path$hosts/temp_$output.txt && 
+			python3 $application_path$striker_folder/striker.py $hosts |& tee -a $report_path$hosts/temp_$output.txt &&
 			cat $report_path$hosts/temp_$output.txt | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g" | sed "s/\x0f//g" >  $report_path$hosts/$output.txt;
 			rm $report_path$hosts/temp_$output.txt
 			echo ""
@@ -625,7 +588,7 @@ function active_recon_nikto_module {
 			#Nmap HTTP Scan
 			echo ""
 			output="Nmap_Http_Enum_Scan_Report"
-			nmap -p $portz -sV -sS --script=http-iis-webdav-vuln,http-vuln-*,http-phpmyadmin-dir-traversal,http-title,http-method-tamper,http-traceroute,http-waf-detect,http-waf-fingerprint,http-internal-ip-disclosure,http-server-header,whois-ip,http-exif-spider,http-headers,http-referer-checker,http-enum,http-open-redirect,http-phpself-xss,http-xssed,http-userdir-enum,http-sitemap-generator,http-svn-info,http-unsafe-output-escaping,http-default-accounts,http-aspnet-debug,http-php-version,http-cross-domain-policy,http-comments-displayer,http-backup-finder,http-auth-finder,http-apache-server-status,http-ls,http-mcmp,http-mobileversion-checker,http-robtex-shared-ns,http-rfi-spider,http-vhosts,firewalk --traceroute  $hosts -oX $report_path$hosts/$output.xml 2> /dev/null
+			nmap -p $portz -sV -sS --script "http-iis-webdav-vuln,http-vuln-*,http-phpmyadmin-dir-traversal,http-title,http-method-tamper,http-traceroute,http-waf-detect,http-waf-fingerprint,http-internal-ip-disclosure,http-server-header,whois-ip,http-exif-spider,http-headers,http-referer-checker,http-enum,http-open-redirect,http-phpself-xss,http-xssed,http-userdir-enum,http-sitemap-generator,http-svn-info,http-unsafe-output-escaping,http-default-accounts,http-aspnet-debug,http-php-version,http-cross-domain-policy,http-comments-displayer,http-backup-finder,http-auth-finder,http-apache-server-status,http-ls,http-mcmp,http-mobileversion-checker,http-robtex-shared-ns,http-rfi-spider,http-vhosts,firewalk" --traceroute  $hosts -oX $report_path$hosts/$output.xml 2> /dev/null
 			xml2html $hosts $output
 			echo ""
 						
@@ -637,13 +600,11 @@ function active_recon_nikto_module {
 			echo "/    / )(  )  (   )( (  O )  \___ \( (__ /    \/    / " |& tee -a  $report_path$hosts/$output.txt;
 			echo "\_)__)(__)(__\_) (__) \__/   (____/ \___)\_/\_/\_)__)" |& tee -a  $report_path$hosts/$output.txt;
 			echo "" |& tee -a  $report_path$hosts/$output.txt;
-			nikto -h $protocols://$hosts |& tee -a  $report_path$hosts/$output.txt;
+			nikto -h $protocols://$hosts -o $report_path$hosts/$output.txt -Format txt;
 			echo "" |& tee -a  $report_path$hosts/$output.txt;
 			
 			x-www-browser $report_path$hosts/$output.txt 2> /dev/null  | &> /dev/null &
 			active_recon_interface
-		fi
-	done	
 	}
 
 	
@@ -750,12 +711,12 @@ function active_brute_dir_module {
 		output="Web_Files_Bruteforce_Report"
 		echo -e "File Type (can be more than one)?: e.g. [.php,.html,.asp,.others..] \c"
 		read file_type
-		xterm -e "dirb $protocols://$hosts/ -X $file_type $use_word_list  -o $report_path$hosts/$output.txt && $report_path$hosts/$output.txt 2> /dev/null ; x-www-browser $report_path$hosts/$output.txt  | 2> /dev/null " &
+		dirb $protocols://$hosts/ -X $file_type $use_word_list  -o $report_path$hosts/$output.txt &
 		active_recon_interface
 		;;
 	*)
 		output="Web_Directory_Bruteforce_Report"
-		xterm -e "dirb $protocols://$hosts/ $use_word_list  -o $report_path$hosts/$output.txt && $report_path$hosts/$output.txt 2> /dev/null ; x-www-browser $report_path$hosts/$output.txt  | 2> /dev/null " &
+		dirb $protocols://$hosts/ $use_word_list  -o $report_path$hosts/$output.txt &
 		active_recon_interface
 		;;
 	esac
@@ -893,7 +854,10 @@ Select from the 'Passive Reconnaisance' menu:
 	
 	case "$choice" in
 	"1")
-		pa_whois
+		echo -e "What is your host? e.g. example.com  \c"
+		read hosts
+		whois $hosts |& tee -a $report_path$hosts/whois.txt &
+		passive_recon_interface
 		;;
 	"2")
 		pa_google_dork
@@ -1058,11 +1022,11 @@ Select from the 'Active Reconnaisance' menu:
 		active_http_method_module
 		;;
 	"13")
-		xterm -e "service postgresql start && armitage" &
+		service postgresql start && armitage &
 		active_recon_interface
 		;;
 	"14")
-		xterm -e "burpsuite" &
+		burpsuite &
 		active_recon_interface
 		;;
 	*)
